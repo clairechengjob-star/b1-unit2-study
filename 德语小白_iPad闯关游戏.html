@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>德语小白闯关乐园</title>
+<style>
+:root{--bg:#f6fbff;--card:#fff;--blue:#2f80ed;--red:#ef5b5b;--green:#27ae60;--ink:#17324d;--muted:#6f8297;--gold:#f2c94c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif;background:linear-gradient(180deg,#eaf6ff,#fff8ee);color:var(--ink)}
+.app{max-width:980px;margin:auto;padding:18px 16px 120px}
+header{background:rgba(255,255,255,.95);border:1px solid #dce9f6;border-radius:24px;padding:18px;box-shadow:0 10px 30px rgba(35,80,120,.08);position:sticky;top:8px;z-index:5}
+h1{margin:0;font-size:28px} .sub{color:var(--muted);margin-top:5px;font-size:14px}
+.progressWrap{margin-top:14px;background:#eaf0f5;height:12px;border-radius:999px;overflow:hidden}
+#progress{height:100%;width:0;background:linear-gradient(90deg,#2f80ed,#27ae60);transition:.3s}
+.stats{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap} .pill{background:#f3f7fb;border-radius:999px;padding:6px 10px;font-size:13px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
+.tab{border:0;border-radius:16px;padding:13px 6px;background:white;box-shadow:0 4px 16px rgba(0,0,0,.06);font-weight:700;color:#466}
+.tab.active{background:#2f80ed;color:white}
+.panel{display:none} .panel.active{display:block}
+.card{background:white;border-radius:26px;padding:22px;box-shadow:0 12px 32px rgba(50,80,110,.10);min-height:420px}
+.chapter{font-size:14px;color:#7b8da0;margin-bottom:8px}
+.word{font-size:42px;font-weight:800;margin:8px 0 4px;line-height:1.15}
+.zh{font-size:28px;color:var(--red);font-weight:800;margin:10px 0}
+.note{background:#fff6dc;border-radius:16px;padding:12px 14px;margin:12px 0;font-size:17px}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+button.big{flex:1;min-width:150px;border:0;border-radius:18px;padding:15px 16px;font-size:18px;font-weight:800}
+.primary{background:#2f80ed;color:white} .ok{background:#27ae60;color:white} .ghost{background:#eef5fb;color:#274b6a}
+.speaker{font-size:24px}
+.answer{margin-top:18px;padding:16px;border-radius:18px;background:#f6f9fc;display:none}
+.answer.show{display:block}
+.choicegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.choice{background:#f5f8fb;border:2px solid transparent;border-radius:18px;padding:16px;font-size:18px;font-weight:700;text-align:left}
+.choice.correct{border-color:#27ae60;background:#eaf8ef} .choice.wrong{border-color:#ef5b5b;background:#fff0f0}
+.sentenceBox{font-size:30px;font-weight:800;background:#f8fbff;border-radius:18px;padding:18px;margin:12px 0;min-height:90px}
+.tokens{display:flex;gap:10px;flex-wrap:wrap} .token{border:0;border-radius:14px;background:#eef4fa;padding:11px 14px;font-size:20px}
+.builder{min-height:66px;border:2px dashed #c8d6e5;border-radius:16px;padding:12px;display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.small{font-size:14px;color:#7d8b99}
+select{width:100%;padding:12px;border-radius:14px;border:1px solid #d6e1eb;font-size:17px;background:white}
+#install{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;width:min(94%,900px);background:#17324d;color:white;border-radius:18px;padding:12px 15px;font-size:14px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+#install b{color:#ffd66b}
+@media(max-width:700px){.tabs{grid-template-columns:1fr 1fr}.word{font-size:34px}.choicegrid{grid-template-columns:1fr}.card{min-height:480px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<h1>🎄 德语小白闯关乐园</h1>
+<div class="sub">专为中国零基础学生：先听 → 再认 → 再说 → 最后造句</div>
+<div class="progressWrap"><div id="progress"></div></div>
+<div class="stats"><div class="pill">⭐ 得分 <b id="score">0</b></div><div class="pill">🔥 连对 <b id="streak">0</b></div><div class="pill">📚 已学 <b id="seen">0</b></div></div>
+</header>
+
+<div class="tabs">
+<button class="tab active" data-tab="learn">① 听音认词</button>
+<button class="tab" data-tab="quiz">② 中文选德语</button>
+<button class="tab" data-tab="speak">③ 跟读模仿</button>
+<button class="tab" data-tab="sentence">④ 拼句造句</button>
+</div>
+
+<section id="learn" class="panel active"><div class="card">
+<div class="chapter" id="lchapter"></div><div class="word" id="lword"></div><div class="zh" id="lzh"></div>
+<div class="note" id="lnote"></div>
+<div class="btnrow"><button class="big primary speaker" onclick="speakDe(current.de)">🔊 听德语</button><button class="big ghost speaker" onclick="speakZh(current.zh)">🇨🇳 听中文</button></div>
+<div class="btnrow"><button class="big ok" onclick="nextLearn()">我记住了 →</button></div>
+<div class="small">建议：每个词至少听 3 遍，嘴巴跟着说。不要只用眼睛看。</div>
+</div></section>
+
+<section id="quiz" class="panel"><div class="card">
+<div class="chapter">看到中文，点正确的德语</div><div class="zh" id="qzh"></div>
+<div class="choicegrid" id="choices"></div>
+<div class="answer" id="qanswer"></div>
+<div class="btnrow"><button class="big primary" onclick="newQuiz()">下一题 →</button></div>
+</div></section>
+
+<section id="speak" class="panel"><div class="card">
+<div class="chapter">先点播放，再大声模仿 3 遍</div><div class="word" id="sword"></div><div class="zh" id="szh"></div>
+<div class="btnrow"><button class="big primary speaker" onclick="speakDe(speakItem.de)">🔊 慢速德语</button><button class="big ghost" onclick="slowRepeat()">🐢 超慢 × 3</button></div>
+<div class="note">跟读口诀：<b>看词 → 听 → 停 → 模仿 → 再听</b><br>不要追求快，先追求嘴型和节奏。</div>
+<div class="btnrow"><button class="big ok" onclick="nextSpeak()">我读完 3 遍 →</button></div>
+</div></section>
+
+<section id="sentence" class="panel"><div class="card">
+<div class="chapter">把词块按正确顺序点出来</div>
+<div class="word" id="targetWord"></div><div class="zh" id="targetZh"></div>
+<div class="sentenceBox" id="sentenceZh"></div>
+<div class="builder" id="builder"></div><div class="tokens" id="tokens"></div>
+<div class="answer" id="sentAnswer"></div>
+<div class="btnrow"><button class="big ghost" onclick="resetBuilder()">重来</button><button class="big primary" onclick="checkSentence()">检查句子</button><button class="big ok" onclick="newSentence()">下一句 →</button></div>
+</div></section>
+</div>
+<div id="install">📱 iPad 使用：把这个 HTML 用 Safari 打开 → 点 <b>分享</b> → <b>添加到主屏幕</b>，以后就像 App 一样点开。发音使用 iPad 自带语音。</div>
+<script>
+const vocab = [{"chapter": "圣诞市场开场", "de": "der Exportschlager", "zh": "热门出口产品", "note": "像“出口冠军”一样畅销", "sentence": "", "sentenceZh": ""}, {"chapter": "圣诞市场开场", "de": "der Weihnachtsmarkt", "zh": "圣诞节集市", "note": "Weihnachten + Markt = 圣诞 + 市场", "sentence": "Ich gehe auf den Weihnachtsmarkt.", "sentenceZh": "我去圣诞市场。"}, {"chapter": "圣诞市场开场", "de": "naschen", "zh": "吃甜食；吃零食", "note": "看到甜食就“馋一口”", "sentence": "Ich nasche gern Schokolade.", "sentenceZh": "我喜欢吃巧克力零食。"}, {"chapter": "圣诞市场开场", "de": "die Mandel", "zh": "杏仁", "note": "圣诞市场的烤杏仁", "sentence": "Ich esse gern Mandeln.", "sentenceZh": "我喜欢吃杏仁。"}, {"chapter": "圣诞市场开场", "de": "die Rosinen", "zh": "葡萄干", "note": "小小干果", "sentence": "Ich mag keine Rosinen.", "sentenceZh": "我不喜欢葡萄干。"}, {"chapter": "圣诞市场开场", "de": "die Vielfalt", "zh": "多种多样；五花八门", "note": "摊位多得眼花缭乱", "sentence": "Hier gibt es eine große Vielfalt.", "sentenceZh": "这里种类很多。"}, {"chapter": "圣诞市场开场", "de": "die Weihnachtsdekoration", "zh": "圣诞装饰", "note": "Dekoration = 装饰", "sentence": "Die Weihnachtsdekoration ist schön.", "sentenceZh": "圣诞装饰很漂亮。"}, {"chapter": "圣诞市场开场", "de": "die Bratwurst", "zh": "烤香肠；煎香肠", "note": "Brat- 想成“烤”", "sentence": "Die Bratwurst ist lecker.", "sentenceZh": "烤香肠很好吃。"}, {"chapter": "圣诞市场开场", "de": "der Glühwein", "zh": "热红葡萄酒", "note": "热得发光的 Wein", "sentence": "Im Winter trinke ich Glühwein.", "sentenceZh": "冬天我喝热红酒。"}, {"chapter": "圣诞市场开场", "de": "die Vorfreude", "zh": "事前的喜悦；期待的快乐", "note": "事情还没来，快乐先来了", "sentence": "Die Vorfreude ist groß.", "sentenceZh": "期待的快乐很强烈。"}, {"chapter": "圣诞市场开场", "de": "allerbest", "zh": "最好；最佳", "note": "best 的超级加强版", "sentence": "", "sentenceZh": ""}, {"chapter": "圣诞市场开场", "de": "das Weihnachtslied", "zh": "圣诞歌", "note": "Lied = 歌", "sentence": "Ich höre ein Weihnachtslied.", "sentenceZh": "我听一首圣诞歌。"}, {"chapter": "圣诞市场开场", "de": "die Magie", "zh": "魔力；魔术", "note": "圣诞夜的魔法", "sentence": "Weihnachten hat Magie.", "sentenceZh": "圣诞节有魔力。"}, {"chapter": "圣诞市场开场", "de": "wirken", "zh": "有效果；产生影响", "note": "装饰“起作用”了", "sentence": "", "sentenceZh": ""}, {"chapter": "灯光、树与圣诞老人", "de": "der Duft", "zh": "香味；香气", "note": "闻到 Glühwein 的香气", "sentence": "Der Duft ist schön.", "sentenceZh": "这个香味很好闻。"}, {"chapter": "灯光、树与圣诞老人", "de": "das Räuchermännchen", "zh": "香熏小木人", "note": "会冒香气的小木人", "sentence": "", "sentenceZh": ""}, {"chapter": "灯光、树与圣诞老人", "de": "der Klang", "zh": "音乐；乐声；声音", "note": "铃铛的声音", "sentence": "", "sentenceZh": ""}, {"chapter": "灯光、树与圣诞老人", "de": "das Glöckchen", "zh": "小铃铛", "note": "-chen = 小", "sentence": "Das Glöckchen klingt schön.", "sentenceZh": "小铃铛声音很好听。"}, {"chapter": "灯光、树与圣诞老人", "de": "der Tannenbaum", "zh": "冷杉树", "note": "经典圣诞树", "sentence": "Der Tannenbaum ist grün.", "sentenceZh": "冷杉树是绿色的。"}, {"chapter": "灯光、树与圣诞老人", "de": "die Weihnachtspyramide", "zh": "圣诞金字塔", "note": "会转动的圣诞装饰", "sentence": "", "sentenceZh": ""}, {"chapter": "灯光、树与圣诞老人", "de": "die Weihnachtsmarkttasse", "zh": "圣诞市场马克杯", "note": "市场限定杯", "sentence": "", "sentenceZh": ""}, {"chapter": "灯光、树与圣诞老人", "de": "der Weihnachtsbaum", "zh": "圣诞树", "note": "Weihnachten + Baum", "sentence": "Der Weihnachtsbaum ist groß.", "sentenceZh": "圣诞树很大。"}, {"chapter": "灯光、树与圣诞老人", "de": "die Kerze", "zh": "蜡烛", "note": "点亮一根小蜡烛", "sentence": "Die Kerze leuchtet.", "sentenceZh": "蜡烛亮着。"}, {"chapter": "灯光、树与圣诞老人", "de": "der Lebkuchen", "zh": "胡椒蜂蜜饼；姜饼", "note": "德国圣诞姜饼", "sentence": "Ich esse einen Lebkuchen.", "sentenceZh": "我吃一个姜饼。"}, {"chapter": "灯光、树与圣诞老人", "de": "die Pyramide", "zh": "金字塔；棱锥体", "note": "形状记单词", "sentence": "", "sentenceZh": ""}, {"chapter": "灯光、树与圣诞老人", "de": "das Holzfigürchen", "zh": "木制小雕像", "note": "Holz 木头 + 小人", "sentence": "", "sentenceZh": ""}, {"chapter": "灯光、树与圣诞老人", "de": "neugierig", "zh": "好奇的", "note": "好奇地盯着礼物", "sentence": "Ich bin neugierig.", "sentenceZh": "我很好奇。"}, {"chapter": "灯光、树与圣诞老人", "de": "das Original", "zh": "原型；原作；原件", "note": "original 原版", "sentence": "", "sentenceZh": ""}, {"chapter": "灯光、树与圣诞老人", "de": "der Weihnachtsmann", "zh": "圣诞老人", "note": "圣诞 + 男人", "sentence": "Der Weihnachtsmann kommt.", "sentenceZh": "圣诞老人来了。"}, {"chapter": "圣诞味道实验室", "de": "das Gewürz", "zh": "调味品；香料", "note": "香料精灵", "sentence": "Zimt ist ein Gewürz.", "sentenceZh": "肉桂是一种香料。"}, {"chapter": "圣诞味道实验室", "de": "die Orangenschale", "zh": "橙子皮", "note": "Orange + Schale 外皮", "sentence": "Im Punsch ist Orangenschale.", "sentenceZh": "潘趣饮料里有橙子皮。"}, {"chapter": "圣诞味道实验室", "de": "die Schlagsahne", "zh": "奶油；搅打奶油", "note": "甜点上的奶油", "sentence": "", "sentenceZh": ""}, {"chapter": "圣诞味道实验室", "de": "der Eierpunsch", "zh": "蛋酒；混合性饮料", "note": "Ei 蛋 + Punsch", "sentence": "", "sentenceZh": ""}, {"chapter": "圣诞味道实验室", "de": "der Rum", "zh": "朗姆酒", "note": "Glühwein 的成人版配料", "sentence": "", "sentenceZh": ""}, {"chapter": "圣诞味道实验室", "de": "der Zimt", "zh": "桂皮；肉桂", "note": "圣诞味道 = 肉桂", "sentence": "Ich mag Zimt.", "sentenceZh": "我喜欢肉桂。"}, {"chapter": "圣诞味道实验室", "de": "der Früchtetee", "zh": "水果茶", "note": "Früchte 水果 + Tee 茶", "sentence": "Ich trinke Früchtetee.", "sentenceZh": "我喝水果茶。"}, {"chapter": "圣诞味道实验室", "de": "der Früchtepunsch", "zh": "水果宾治；水果潘趣", "note": "水果版 Punsch", "sentence": "", "sentenceZh": ""}, {"chapter": "圣诞味道实验室", "de": "der Liebesapfel", "zh": "苹果糖", "note": "红红的“爱情苹果”", "sentence": "", "sentenceZh": ""}, {"chapter": "圣诞味道实验室", "de": "die Lebensmittelfarbe", "zh": "食用色素", "note": "Lebensmittel 食物 + Farbe 颜色", "sentence": "", "sentenceZh": ""}, {"chapter": "圣诞味道实验室", "de": "der Zitronensaft", "zh": "柠檬汁", "note": "Zitrone + Saft", "sentence": "Ich brauche Zitronensaft.", "sentenceZh": "我需要柠檬汁。"}, {"chapter": "圣诞味道实验室", "de": "der Kartoffelpuffer", "zh": "土豆煎饼", "note": "Kartoffel 土豆", "sentence": "Ich esse Kartoffelpuffer.", "sentenceZh": "我吃土豆煎饼。"}, {"chapter": "圣诞味道实验室", "de": "das Mehl", "zh": "面粉", "note": "做饼先找面粉", "sentence": "Ich brauche Mehl.", "sentenceZh": "我需要面粉。"}, {"chapter": "圣诞味道实验室", "de": "das Apfelmus", "zh": "苹果泥", "note": "Apfel 苹果 + Mus 泥", "sentence": "Ich esse Apfelmus.", "sentenceZh": "我吃苹果泥。"}, {"chapter": "圣诞味道实验室", "de": "der Wahnsinn", "zh": "不可思议；疯狂", "note": "哇！太夸张了", "sentence": "", "sentenceZh": ""}, {"chapter": "圣诞味道实验室", "de": "riesengroß", "zh": "巨大的", "note": "Riese 巨人 + groß 大", "sentence": "Der Baum ist riesengroß.", "sentenceZh": "这棵树非常大。"}, {"chapter": "圣诞味道实验室", "de": "der Punsch", "zh": "潘趣酒；混合饮料", "note": "冬天热饮", "sentence": "Ich trinke einen Punsch.", "sentenceZh": "我喝一杯潘趣。"}, {"chapter": "圣诞味道实验室", "de": "die Kugel", "zh": "球", "note": "两球冰淇淋", "sentence": "Ich nehme zwei Kugeln Eis.", "sentenceZh": "我要两球冰淇淋。"}, {"chapter": "圣诞味道实验室", "de": "die Waffel", "zh": "华夫饼；威化饼干", "note": "格子饼", "sentence": "Ich esse gern Waffeln.", "sentenceZh": "我喜欢吃华夫饼。"}, {"chapter": "降临节与送礼物", "de": "der Advent", "zh": "基督降临节；降临节期间", "note": "圣诞前四周", "sentence": "Der Advent beginnt.", "sentenceZh": "降临节开始了。"}, {"chapter": "降临节与送礼物", "de": "das Christkind", "zh": "耶稣圣婴；基督圣婴", "note": "Christ + Kind", "sentence": "", "sentenceZh": ""}, {"chapter": "降临节与送礼物", "de": "die Adventszeit", "zh": "基督降临节；降临节时间", "note": "Advent 的时间", "sentence": "", "sentenceZh": ""}, {"chapter": "降临节与送礼物", "de": "anzünden", "zh": "点燃", "note": "把蜡烛点亮", "sentence": "Ich zünde die Kerze an.", "sentenceZh": "我点燃蜡烛。"}, {"chapter": "降临节与送礼物", "de": "besorgen", "zh": "购买；采购", "note": "去把礼物买齐", "sentence": "Ich besorge Geschenke.", "sentenceZh": "我去买礼物。"}, {"chapter": "降临节与送礼物", "de": "das Plätzchen", "zh": "小饼干", "note": "圣诞小饼干", "sentence": "Das Plätzchen ist lecker.", "sentenceZh": "小饼干很好吃。"}, {"chapter": "降临节与送礼物", "de": "schmücken", "zh": "装饰", "note": "把树装漂亮", "sentence": "Ich schmücke den Weihnachtsbaum.", "sentenceZh": "我装饰圣诞树。"}, {"chapter": "降临节与送礼物", "de": "basteln", "zh": "做手工；制作", "note": "自己做礼物", "sentence": "Ich bastle ein Geschenk.", "sentenceZh": "我做一个手工礼物。"}, {"chapter": "降临节与送礼物", "de": "übermorgen", "zh": "后天", "note": "明天后面的那一天", "sentence": "Übermorgen ist Mittwoch.", "sentenceZh": "后天是星期三。"}, {"chapter": "降临节与送礼物", "de": "der Gartenhandschuh", "zh": "园艺手套", "note": "Garten 花园 + Handschuh 手套", "sentence": "", "sentenceZh": ""}, {"chapter": "降临节与送礼物", "de": "der Abwasch", "zh": "洗涤；洗碗", "note": "吃完饭后的任务", "sentence": "", "sentenceZh": ""}, {"chapter": "降临节与送礼物", "de": "der Staub", "zh": "灰尘", "note": "一吹就飞", "sentence": "Hier ist viel Staub.", "sentenceZh": "这里灰尘很多。"}, {"chapter": "降临节与送礼物", "de": "saugen", "zh": "吸（尘）", "note": "吸尘器在工作", "sentence": "Ich sauge den Staub.", "sentenceZh": "我吸灰尘。"}, {"chapter": "降临节与送礼物", "de": "verpacken", "zh": "包装；打包", "note": "礼物包起来", "sentence": "Ich verpacke das Geschenk.", "sentenceZh": "我包装礼物。"}, {"chapter": "降临节与送礼物", "de": "abräumen", "zh": "清除；收拾", "note": "把桌面清空", "sentence": "Ich räume den Tisch ab.", "sentenceZh": "我收拾桌子。"}, {"chapter": "降临节与送礼物", "de": "kaltstellen", "zh": "使冷却；冰镇", "note": "kalt 冷 + stellen 放", "sentence": "Ich stelle die Getränke kalt.", "sentenceZh": "我把饮料冰镇起来。"}, {"chapter": "降临节与送礼物", "de": "vorstellbar", "zh": "可想象的", "note": "能在脑子里想出来", "sentence": "", "sentenceZh": ""}, {"chapter": "降临节与送礼物", "de": "die Kosmetik", "zh": "化妆品", "note": "送姐姐的礼物", "sentence": "Ich kaufe Kosmetik.", "sentenceZh": "我买化妆品。"}, {"chapter": "降临节与送礼物", "de": "der Pulli", "zh": "套衫；羊毛套衫", "note": "Pullover 的口语缩写", "sentence": "Der Pulli ist warm.", "sentenceZh": "套头衫很暖和。"}, {"chapter": "降临节与送礼物", "de": "die Unterhaltungselektronik", "zh": "消费电子产品；娱乐电子产品", "note": "电视、音响、游戏机", "sentence": "", "sentenceZh": ""}, {"chapter": "降临节与送礼物", "de": "der/die Beschenkte", "zh": "收礼人", "note": "被送礼物的人", "sentence": "", "sentenceZh": ""}, {"chapter": "降临节与送礼物", "de": "das Gesellschaftsspiel", "zh": "社交游戏；集体游戏", "note": "一起玩的桌游", "sentence": "", "sentenceZh": ""}, {"chapter": "降临节与送礼物", "de": "die Puppe", "zh": "玩具娃娃", "note": "小朋友的礼物", "sentence": "Das Kind spielt mit der Puppe.", "sentenceZh": "孩子玩娃娃。"}, {"chapter": "审美大战", "de": "hässlich", "zh": "难看的；丑恶的", "note": "和 schön 对着干", "sentence": "Das Bild ist hässlich.", "sentenceZh": "这幅画很难看。"}, {"chapter": "审美大战", "de": "der Engel", "zh": "天使", "note": "树上的天使", "sentence": "Der Engel ist schön.", "sentenceZh": "这个天使很漂亮。"}, {"chapter": "审美大战", "de": "die Lichtfigur", "zh": "造型灯；灯饰", "note": "会发光的造型", "sentence": "", "sentenceZh": ""}, {"chapter": "审美大战", "de": "das Engelchen", "zh": "小天使", "note": "Engel + -chen", "sentence": "", "sentenceZh": ""}, {"chapter": "审美大战", "de": "das Vögelchen", "zh": "小鸟", "note": "Vogel 变小", "sentence": "", "sentenceZh": ""}, {"chapter": "审美大战", "de": "der Kitsch", "zh": "俗气的艺术作品；拙劣的艺术品", "note": "“好看还是俗？”", "sentence": "Das ist Kitsch.", "sentenceZh": "这是俗气的装饰。"}, {"chapter": "审美大战", "de": "spalten", "zh": "分裂", "note": "意见裂成两半", "sentence": "Die Meinungen sind gespalten.", "sentenceZh": "大家意见不一。"}, {"chapter": "审美大战", "de": "der Freundeskreis", "zh": "朋友圈；交际圈", "note": "Freunde + Kreis", "sentence": "", "sentenceZh": ""}, {"chapter": "审美大战", "de": "das Flügelchen", "zh": "小翅膀", "note": "Flügel + -chen", "sentence": "", "sentenceZh": ""}, {"chapter": "审美大战", "de": "solcher / solche / solches", "zh": "这样的；这类的", "note": "指“这样的东西”", "sentence": "", "sentenceZh": ""}, {"chapter": "审美大战", "de": "kitschig", "zh": "庸俗的；拙劣的；低级的", "note": "Kitsch 的形容词", "sentence": "Die Dekoration ist kitschig.", "sentenceZh": "这个装饰有点俗气。"}, {"chapter": "审美大战", "de": "die Geschmackssache", "zh": "个人爱好问题；品味问题", "note": "萝卜青菜各有所爱", "sentence": "Das ist Geschmackssache.", "sentenceZh": "这是个人喜好问题。"}, {"chapter": "审美大战", "de": "originell", "zh": "独创的；独特的", "note": "点子很有原创性", "sentence": "Die Idee ist originell.", "sentenceZh": "这个想法很有创意。"}, {"chapter": "审美大战", "de": "innovativ", "zh": "革新的；有创新力的", "note": "新点子", "sentence": "Die Idee ist innovativ.", "sentenceZh": "这个想法很创新。"}, {"chapter": "审美大战", "de": "anregen", "zh": "出主意；鼓励", "note": "给别人灵感", "sentence": "", "sentenceZh": ""}, {"chapter": "审美大战", "de": "exklusiv", "zh": "限于少数人的；排他性的", "note": "VIP 限定", "sentence": "Das Produkt ist exklusiv.", "sentenceZh": "这个产品是限量/专属的。"}, {"chapter": "审美大战", "de": "produzieren", "zh": "生产；制造", "note": "工厂生产", "sentence": "Die Firma produziert Spielzeug.", "sentenceZh": "这家公司生产玩具。"}, {"chapter": "审美大战", "de": "wiedererkennen", "zh": "重新认出", "note": "变化后还能认出来", "sentence": "Ich erkenne dich wieder.", "sentenceZh": "我认出你了。"}, {"chapter": "审美大战", "de": "die Erinnerung", "zh": "回忆", "note": "把画面留在脑子里", "sentence": "Ich habe eine schöne Erinnerung.", "sentenceZh": "我有一段美好的回忆。"}, {"chapter": "表达观点与圣诞树", "de": "einerseits … andererseits", "zh": "一方面……另一方面", "note": "左右两边各有理由", "sentence": "Einerseits ist es schön, andererseits ist es teuer.", "sentenceZh": "一方面它很漂亮，另一方面它很贵。"}, {"chapter": "表达观点与圣诞树", "de": "auf der einen Seite … auf der anderen Seite", "zh": "一方面……另一方面", "note": "左右两侧", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "zwar … aber …", "zh": "虽然……但是……", "note": "先让步，再转折", "sentence": "Es ist zwar teuer, aber schön.", "sentenceZh": "它虽然贵，但是漂亮。"}, {"chapter": "表达观点与圣诞树", "de": "der Geschmack", "zh": "爱好；鉴赏力", "note": "你的品味", "sentence": "Du hast einen guten Geschmack.", "sentenceZh": "你很有品味。"}, {"chapter": "表达观点与圣诞树", "de": "die Vase", "zh": "花瓶", "note": "花放进瓶子", "sentence": "Die Blumen sind in der Vase.", "sentenceZh": "花在花瓶里。"}, {"chapter": "表达观点与圣诞树", "de": "das Landschaftsgemälde", "zh": "山水画；风景画", "note": "Landschaft 风景 + Gemälde 画", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "das Graffiti", "zh": "涂鸦；乱涂乱画", "note": "墙上的字画", "sentence": "In der Stadt gibt es Graffiti.", "sentenceZh": "城市里有涂鸦。"}, {"chapter": "表达观点与圣诞树", "de": "die Holzfigur", "zh": "木制人偶", "note": "Holz 木头 + Figur 人偶", "sentence": "Ich kaufe eine Holzfigur.", "sentenceZh": "我买一个木制人偶。"}, {"chapter": "表达观点与圣诞树", "de": "die Schneekugel", "zh": "雪球；雪景球", "note": "摇一摇就下雪", "sentence": "Die Schneekugel ist schön.", "sentenceZh": "雪景球很漂亮。"}, {"chapter": "表达观点与圣诞树", "de": "das Würmchen", "zh": "小虫；蠕虫", "note": "Wurm + -chen", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "das Schirmchen", "zh": "小伞", "note": "Schirm + -chen", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "das Türmchen", "zh": "小塔楼", "note": "Turm + -chen", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "die Tanne", "zh": "冷杉", "note": "圣诞树的一种", "sentence": "Die Tanne ist ein Baum.", "sentenceZh": "冷杉是一种树。"}, {"chapter": "表达观点与圣诞树", "de": "die Verbreitung", "zh": "传播；分布", "note": "从一个地方扩散出去", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "die Art", "zh": "种类；品种", "note": "不同类型", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "die Nadel", "zh": "针叶", "note": "冷杉树的针叶", "sentence": "Der Baum hat viele Nadeln.", "sentenceZh": "树上有很多针叶。"}, {"chapter": "表达观点与圣诞树", "de": "immergrün", "zh": "常青的", "note": "immer 一直 + grün 绿", "sentence": "Die Tanne ist immergrün.", "sentenceZh": "冷杉是常青的。"}, {"chapter": "表达观点与圣诞树", "de": "sich erfreuen", "zh": "对……感到有乐趣；喜爱", "note": "看到喜欢的东西很开心", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "die Beständigkeit", "zh": "稳定性；耐久性", "note": "一直保持", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "der Trost", "zh": "安慰", "note": "歌曲带来安慰", "sentence": "Das Lied gibt mir Trost.", "sentenceZh": "这首歌给我安慰。"}, {"chapter": "表达观点与圣诞树", "de": "lehren", "zh": "教；讲授", "note": "老师教德语", "sentence": "Der Lehrer lehrt Deutsch.", "sentenceZh": "老师教德语。"}, {"chapter": "表达观点与圣诞树", "de": "die Strophe", "zh": "节；段", "note": "歌曲的一段", "sentence": "Das Lied hat vier Strophen.", "sentenceZh": "这首歌有四段。"}, {"chapter": "表达观点与圣诞树", "de": "die Hymne", "zh": "国歌；颂歌", "note": "庄重的歌", "sentence": "Das Land hat eine Hymne.", "sentenceZh": "这个国家有一首国歌。"}, {"chapter": "表达观点与圣诞树", "de": "der Bundesstaat", "zh": "联邦州", "note": "美国的州", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "das Festtagslied", "zh": "节日之歌", "note": "Festtag 节日 + Lied 歌", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "das Gegenargument", "zh": "反驳意见；反对论据", "note": "给出相反理由", "sentence": "", "sentenceZh": ""}, {"chapter": "表达观点与圣诞树", "de": "hinten", "zh": "在后面；在背面", "note": "在后方", "sentence": "Der Baum steht hinten.", "sentenceZh": "树在后面。"}, {"chapter": "表达观点与圣诞树", "de": "deutlich", "zh": "清楚的；明确的", "note": "说清楚一点", "sentence": "Bitte sprich deutlich.", "sentenceZh": "请说清楚一点。"}, {"chapter": "手工练习", "de": "kneten", "zh": "揉；捏", "note": "揉面团", "sentence": "Ich knete den Teig.", "sentenceZh": "我揉面团。"}, {"chapter": "手工练习", "de": "der Klebestift", "zh": "胶水笔；固体胶", "note": "粘东西", "sentence": "Ich brauche einen Klebestift.", "sentenceZh": "我需要一支固体胶。"}, {"chapter": "手工练习", "de": "die Ecke", "zh": "角", "note": "四个角", "sentence": "Der Würfel hat acht Ecken.", "sentenceZh": "立方体有八个角。"}, {"chapter": "手工练习", "de": "falten", "zh": "折叠", "note": "把纸折起来", "sentence": "Ich falte das Papier.", "sentenceZh": "我折纸。"}, {"chapter": "手工练习", "de": "kleben", "zh": "粘贴", "note": "把邮票粘上", "sentence": "Ich klebe die Briefmarke.", "sentenceZh": "我粘邮票。"}, {"chapter": "手工练习", "de": "die Stofftasche", "zh": "布袋", "note": "环保布袋", "sentence": "Die Stofftasche ist praktisch.", "sentenceZh": "布袋很实用。"}, {"chapter": "手工练习", "de": "einzigartig", "zh": "独特的；独一无二的", "note": "世界上只有一个", "sentence": "Das Bild ist einzigartig.", "sentenceZh": "这幅画独一无二。"}, {"chapter": "手工练习", "de": "bezeichnen", "zh": "称作；称为", "note": "给它一个名称", "sentence": "Das bezeichnet man als schwierig.", "sentenceZh": "这个被称为困难。"}, {"chapter": "Plateau 2 附加词", "de": "die Neuigkeit", "zh": "新消息；新闻", "note": "有新消息", "sentence": "Ich habe eine Neuigkeit.", "sentenceZh": "我有一个新消息。"}, {"chapter": "Plateau 2 附加词", "de": "der/die Investor/Investorin", "zh": "投资人；投资者", "note": "给公司投资的人", "sentence": "", "sentenceZh": ""}, {"chapter": "Plateau 2 附加词", "de": "riskant", "zh": "冒险的；有危险的", "note": "风险很高", "sentence": "", "sentenceZh": ""}, {"chapter": "Plateau 2 附加词", "de": "der Deal", "zh": "交易；买卖", "note": "做成一笔交易", "sentence": "Das ist ein guter Deal.", "sentenceZh": "这是一笔好交易。"}, {"chapter": "Plateau 2 附加词", "de": "unterschreiben", "zh": "签字；签名", "note": "把名字签上", "sentence": "Ich unterschreibe den Vertrag.", "sentenceZh": "我签合同。"}, {"chapter": "Plateau 2 附加词", "de": "erben", "zh": "继承", "note": "继承房子", "sentence": "Ich erbe ein Haus.", "sentenceZh": "我继承一套房子。"}, {"chapter": "Plateau 2 附加词", "de": "die Gründung", "zh": "建立；创办", "note": "公司成立", "sentence": "Die Gründung der Firma ist neu.", "sentenceZh": "这家公司刚成立。"}, {"chapter": "Plateau 2 附加词", "de": "mietfrei", "zh": "免租的", "note": "不用付房租", "sentence": "Ich wohne mietfrei.", "sentenceZh": "我免租居住。"}, {"chapter": "Plateau 2 附加词", "de": "der/die Konditor/Konditorin", "zh": "面包师；糕点师", "note": "做蛋糕的人", "sentence": "", "sentenceZh": ""}, {"chapter": "Plateau 2 附加词", "de": "die Konditorei", "zh": "蛋糕店；糕点甜食店", "note": "卖甜点的店", "sentence": "Ich gehe in die Konditorei.", "sentenceZh": "我去糕点店。"}, {"chapter": "Plateau 2 附加词", "de": "charmant", "zh": "迷人的；有魅力的", "note": "让人觉得很有好感", "sentence": "Sie ist sehr charmant.", "sentenceZh": "她很有魅力。"}, {"chapter": "Plateau 2 附加词", "de": "das Motivationsschreiben", "zh": "动机信", "note": "求职申请里的动机信", "sentence": "Ich schreibe ein Motivationsschreiben.", "sentenceZh": "我写一封动机信。"}];
+let score=0, streak=0, seen=new Set(), learnIndex=0, current=vocab[0], speakItem=vocab[0], sentenceItem=null, answerTokens=[];
+function updateStats(){
+ document.getElementById('score').textContent=score;document.getElementById('streak').textContent=streak;
+ document.getElementById('seen').textContent=seen.size;document.getElementById('progress').style.width=Math.min(100,seen.size/vocab.length*100)+'%';
+}
+function speak(text,lang,rate=.78){
+ if(!('speechSynthesis' in window)){alert('当前浏览器不支持语音合成，请用 Safari 打开。');return}
+ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);u.lang=lang;u.rate=rate;u.pitch=1;
+ const voices=speechSynthesis.getVoices(); const v=voices.find(x=>x.lang.toLowerCase().startsWith(lang.toLowerCase().slice(0,2))); if(v)u.voice=v;
+ speechSynthesis.speak(u);
+}
+const cleanDe=s=>s.replace(/der\/die/g,'der oder die').replace(/…/g,'');
+function speakDe(t){speak(cleanDe(t),'de-DE',.68)} function speakZh(t){speak(t,'zh-CN',.85)}
+function renderLearn(){
+ current=vocab[learnIndex%vocab.length];document.getElementById('lchapter').textContent=current.chapter;
+ document.getElementById('lword').textContent=current.de;document.getElementById('lzh').textContent=current.zh;document.getElementById('lnote').textContent='🧠 '+current.note;
+ setTimeout(()=>speakDe(current.de),250);
+}
+function nextLearn(){seen.add(current.de);score+=2;learnIndex++;updateStats();renderLearn()}
+function shuffled(a){return [...a].sort(()=>Math.random()-.5)}
+function newQuiz(){
+ const correct=vocab[Math.floor(Math.random()*vocab.length)];
+ const others=shuffled(vocab.filter(x=>x.de!==correct.de)).slice(0,3);
+ document.getElementById('qzh').textContent=correct.zh;
+ const box=document.getElementById('choices');box.innerHTML='';document.getElementById('qanswer').className='answer';
+ shuffled([correct,...others]).forEach(x=>{
+   const b=document.createElement('button');b.className='choice';b.textContent=x.de;
+   b.onclick=()=>{if(x.de===correct.de){b.classList.add('correct');score+=5;streak++;seen.add(correct.de);speakDe(correct.de);
+     document.getElementById('qanswer').innerHTML='✅ '+correct.de+'<br><span class="small">记忆钩子：'+correct.note+'</span>';
+   }else{b.classList.add('wrong');streak=0;score=Math.max(0,score-1)} document.getElementById('qanswer').classList.add('show');updateStats();};
+   box.appendChild(b);
+ });
+}
+function renderSpeak(){document.getElementById('sword').textContent=speakItem.de;document.getElementById('szh').textContent=speakItem.zh}
+function nextSpeak(){seen.add(speakItem.de);score+=3;speakItem=vocab[Math.floor(Math.random()*vocab.length)];renderSpeak();updateStats()}
+function slowRepeat(){let n=0;function go(){if(n++>=3)return; speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(cleanDe(speakItem.de));u.lang='de-DE';u.rate=.52;u.onend=()=>setTimeout(go,450);speechSynthesis.speak(u)}go()}
+function newSentence(){
+ const list=vocab.filter(x=>x.sentence);sentenceItem=list[Math.floor(Math.random()*list.length)];
+ document.getElementById('targetWord').textContent=sentenceItem.de;document.getElementById('targetZh').textContent=sentenceItem.zh;
+ document.getElementById('sentenceZh').textContent='🇨🇳 '+sentenceItem.sentenceZh;
+ answerTokens=sentenceItem.sentence.replace(/[.!?]/g,'').split(/\s+/); resetBuilder();
+}
+function resetBuilder(){
+ document.getElementById('builder').innerHTML='';const tok=document.getElementById('tokens');tok.innerHTML='';document.getElementById('sentAnswer').className='answer';
+ shuffled(answerTokens).forEach((t,i)=>{const b=document.createElement('button');b.className='token';b.textContent=t;b.onclick=()=>{document.getElementById('builder').appendChild(b)};tok.appendChild(b)});
+}
+function checkSentence(){
+ const built=[...document.getElementById('builder').children].map(x=>x.textContent).join(' ');
+ const ok=built===answerTokens.join(' ');const a=document.getElementById('sentAnswer');a.className='answer show';
+ if(ok){a.innerHTML='✅ 太棒了！<br><b>'+sentenceItem.sentence+'</b>';score+=8;streak++;seen.add(sentenceItem.de);speakDe(sentenceItem.sentence)}
+ else{a.innerHTML='❌ 再试一次。正确句子：<br><b>'+sentenceItem.sentence+'</b>';streak=0;speakDe(sentenceItem.sentence)}
+ updateStats();
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active')})
+speechSynthesis.onvoiceschanged=()=>{};
+renderLearn();newQuiz();renderSpeak();newSentence();updateStats();
+</script>
+</body></html>
