@@ -1,0 +1,122 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unit 8 德语单词记忆页</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--text:#202124;--muted:#69707d;--line:#e5e7eb;--accent:#5755d9;--ok:#14785f;--bad:#b33a2b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text)}.wrap{max-width:1080px;margin:auto;padding:24px 16px 60px}
+.hero,.quiz{background:white;border:1px solid var(--line);border-radius:22px;padding:24px}.hero{background:linear-gradient(135deg,#fff,#f0efff)}h1{margin:0 0 10px;font-size:clamp(28px,5vw,46px)}.sub{color:var(--muted);line-height:1.75}
+.method{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.method div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}.method b{display:block;margin-bottom:6px}
+.toolbar{position:sticky;top:0;z-index:5;display:flex;gap:8px;flex-wrap:wrap;padding:12px 0;background:rgba(246,247,251,.95);backdrop-filter:blur(8px)}button,input{font:inherit}button{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 12px;cursor:pointer}.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.stats{margin-left:auto;padding:10px 0;color:var(--muted)}
+.quiz{margin:6px 0 24px}.prompt{font-size:26px;font-weight:800;margin:14px 0 8px}.quiz input{width:100%;border:1px solid var(--line);border-radius:11px;padding:13px;margin-top:12px}.small{font-size:13px;color:var(--muted);line-height:1.6}.feedback{min-height:26px;margin-top:8px;font-weight:700}.ok{color:var(--ok)}.no{color:var(--bad)}
+.section{margin:26px 0}.section h2{font-size:21px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:11px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-height:180px;display:flex;flex-direction:column}.de{font-size:19px;font-weight:800;display:flex;align-items:flex-start;gap:8px}.speak{border:0;background:#f0efff;border-radius:999px;width:34px;height:34px;padding:0;flex:0 0 34px;font-size:17px;line-height:34px}.speak:hover{background:#e3e1ff}.tag{font-size:12px;color:var(--muted);margin:5px 0 10px}.reveal{display:none;border-top:1px dashed var(--line);padding-top:10px}.card.open .reveal{display:block}.en{font-weight:700}.zh{margin-top:5px}.hint{margin-top:8px;background:#f5f5ff;padding:8px;border-radius:9px;font-size:14px}.practice{margin-top:10px}.practice input{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}.chars{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.chars button{padding:6px 10px;border-radius:9px;background:#fafafa}.practice-msg{min-height:22px;margin-top:6px;font-size:13px;font-weight:700}.actions{display:flex;gap:7px;margin-top:auto;padding-top:10px}.actions button{flex:1;padding:7px}.actions .master:disabled{opacity:.45;cursor:not-allowed}.weak.on{background:#fff1de;border-color:#e59b3a}.master.on{background:#e9f8f3;border-color:#3aa77f}
+@media(max-width:700px){.method{grid-template-columns:1fr}.stats{width:100%;margin-left:0}}
+</style></head><body><div class="wrap">
+<section class="hero"><h1>Unit 8：真正记得住的单词页</h1><div class="sub">学生英语基础不错，所以不要再走“德语 → 中文反复看”的低效路线。这里用 <b>English bridge → 德语拆词 → 主动输出</b>。目标不是“见到认识”，而是看到中文或英文后，3 秒内能说出/写出德语。</div>
+<div class="method"><div><b>① English bridge</b>先借英语迅速建立意义：<i>Qualifikation → qualification</i>。</div><div><b>② 拆长词</b><i>Arbeitsmarkt = Arbeit + Markt</i>，像拼积木，不背整串。</div><div><b>③ 强制输出</b>遮住德语，只看中/英文，自己打出来；答错自动进入“易错词”。</div></div></section>
+<div class="toolbar"><button class="primary" onclick="startQuiz()">开始 10 题输出测验</button><button onclick="showWeak()">只看易错词</button><button onclick="showAll()">显示全部</button><button onclick="toggleAll()">全部展开/收起</button><span class="stats" id="stats"></span></div>
+<section class="quiz"><b>主动回忆区</b> <span class="small">每天 10 题，比抄写 10 遍更有效</span><div class="prompt" id="prompt">点击“开始 10 题输出测验”</div><div class="small" id="bridge"></div><input id="answer" placeholder="输入德语；按 Enter 提交" onkeydown="if(event.key==='Enter')checkAnswer()"><div class="chars"><button onclick="insertQuizChar('ä')">ä</button><button onclick="insertQuizChar('ö')">ö</button><button onclick="insertQuizChar('ü')">ü</button><button onclick="insertQuizChar('ß')">ß</button><button onclick="insertQuizChar('Ä')">Ä</button><button onclick="insertQuizChar('Ö')">Ö</button><button onclick="insertQuizChar('Ü')">Ü</button></div><div style="display:flex;gap:8px;margin-top:9px"><button class="primary" onclick="checkAnswer()">提交</button><button onclick="showAnswer()">看答案</button></div><div class="feedback" id="feedback"></div></section>
+<div id="sections"></div><p class="small">复习节奏：第一次学完后 1 分钟回忆一次 → 当天晚些时候再回忆 → 第二天再回忆。每次都从“意思 → 德语”输出。能认出来，不等于能用出来。</p>
+</div><script>
+const DATA=[{"de": "die Arbeitsstelle", "en": "job / position", "zh": "工作岗位", "hint": "Arbeit + Stelle = work + place", "group": "求职"}, {"de": "die Stellenanzeige", "en": "job advertisement", "zh": "招聘广告", "hint": "Stelle + Anzeige = position + ad", "group": "求职"}, {"de": "das Vorstellungsgespräch", "en": "job interview", "zh": "求职面试", "hint": "Vorstellung + Gespräch = introduction + conversation", "group": "求职"}, {"de": "das Protokoll", "en": "minutes / record", "zh": "记录；会议记录", "hint": "≈ protocol", "group": "求职"}, {"de": "der Konflikt", "en": "conflict", "zh": "冲突；矛盾", "hint": "≈ conflict", "group": "求职"}, {"de": "motiviert", "en": "motivated", "zh": "积极的；有动力的", "hint": "≈ motivated", "group": "求职"}, {"de": "die Möbelmanufaktur", "en": "furniture manufactory", "zh": "家具制造厂", "hint": "Möbel + Manufaktur", "group": "求职"}, {"de": "unbefristet", "en": "permanent / unlimited", "zh": "无固定期限的", "hint": "un- + befristet", "group": "求职"}, {"de": "das Gehalt", "en": "salary", "zh": "薪水；工资", "hint": "工作后得到的 salary", "group": "求职"}, {"de": "das Plus", "en": "plus / advantage", "zh": "好处；优点", "hint": "≈ plus", "group": "求职"}, {"de": "der/die Werkstudent/in", "en": "working student", "zh": "工读大学生", "hint": "Werk + Student", "group": "求职"}, {"de": "die Personalabteilung", "en": "HR department", "zh": "人事部门", "hint": "Personal + Abteilung", "group": "求职"}, {"de": "die Elektrotechnik", "en": "electrical engineering", "zh": "电气工程学", "hint": "Elektro + Technik", "group": "求职"}, {"de": "abschließen", "en": "complete / finish", "zh": "结束；完成", "hint": "schließen=close → close off", "group": "职业与行业"}, {"de": "die Forschung", "en": "research", "zh": "研究", "hint": "forschen → Forschung", "group": "职业与行业"}, {"de": "die Entwicklung", "en": "development", "zh": "研制；发展", "hint": "entwickeln → Entwicklung", "group": "职业与行业"}, {"de": "die E-Mobilität", "en": "e-mobility", "zh": "电动出行；电动汽车", "hint": "E + Mobilität", "group": "职业与行业"}, {"de": "die Technologie", "en": "technology", "zh": "技术；工艺", "hint": "≈ technology", "group": "职业与行业"}, {"de": "verbessern", "en": "improve", "zh": "改善；改进", "hint": "besser=better → verbessern", "group": "职业与行业"}, {"de": "der/die Arbeitgeber/in", "en": "employer", "zh": "雇主", "hint": "Arbeit + Geber = work-giver", "group": "职业与行业"}, {"de": "der Kampf", "en": "fight / struggle", "zh": "斗争；战斗", "hint": "竞争是一场 fight", "group": "职业与行业"}, {"de": "der Bedarf", "en": "need / demand", "zh": "需求", "hint": "market Bedarf = market demand", "group": "职业与行业"}, {"de": "die Fachkraft", "en": "skilled worker / specialist", "zh": "专业人员", "hint": "Fach + Kraft", "group": "职业与行业"}, {"de": "die Branche", "en": "industry / sector", "zh": "行业；部门", "hint": "≈ branch → 行业分支", "group": "职业与行业"}, {"de": "tatsächlich", "en": "actually / in fact", "zh": "确实；事实上", "hint": "直接对应 actually / in fact", "group": "职业与行业"}, {"de": "der/die Bewerber/in", "en": "applicant", "zh": "申请人；求职者", "hint": "bewerben=apply → Bewerber", "group": "职业与行业"}, {"de": "das Handwerk", "en": "craft / skilled trade", "zh": "手工业", "hint": "Hand + Werk = hand-work", "group": "职业与行业"}, {"de": "qualifiziert", "en": "qualified", "zh": "有资格的；合格的", "hint": "≈ qualified", "group": "职业与行业"}, {"de": "der/die Berufseinsteiger/in", "en": "career starter", "zh": "职场新人", "hint": "Beruf + Einsteiger", "group": "工作生活"}, {"de": "die Wahl", "en": "choice / election", "zh": "选择", "hint": "wählen=choose → Wahl", "group": "工作生活"}, {"de": "der Arbeitsmarkt", "en": "job market", "zh": "劳动力市场", "hint": "Arbeit + Markt", "group": "工作生活"}, {"de": "einteilen", "en": "divide / assign", "zh": "划分；安排", "hint": "teilen=divide → einteilen", "group": "工作生活"}, {"de": "die Überstunde", "en": "overtime", "zh": "加班", "hint": "über + Stunde = over-hour", "group": "工作生活"}, {"de": "problemlos", "en": "without problems", "zh": "没有问题的；顺利的", "hint": "Problem + -los(without)", "group": "工作生活"}, {"de": "hauptsächlich", "en": "mainly", "zh": "主要地", "hint": "Haupt=main/head", "group": "工作生活"}, {"de": "das Netzwerk", "en": "network", "zh": "网络", "hint": "Netz + Werk", "group": "工作生活"}, {"de": "ansprechen", "en": "approach / address", "zh": "和人沟通；搭话", "hint": "an + sprechen = speak to", "group": "工作生活"}, {"de": "zunächst", "en": "first / initially", "zh": "首先", "hint": "整块记：zunächst = initially", "group": "工作生活"}, {"de": "erreichbar", "en": "reachable / available", "zh": "能联系到的", "hint": "erreichen + -bar = reachable", "group": "工作生活"}, {"de": "definitiv", "en": "definitely", "zh": "肯定地；确定的", "hint": "≈ definitely", "group": "工作生活"}, {"de": "umgehen (mit)", "en": "deal with", "zh": "对待；处理", "hint": "mit etwas umgehen = deal with", "group": "工作生活"}, {"de": "die Qualifikation", "en": "qualification", "zh": "资格；能力", "hint": "≈ qualification", "group": "岗位条件"}, {"de": "die Leistung", "en": "performance / achievement", "zh": "成绩；绩效", "hint": "工作语境 = performance", "group": "岗位条件"}, {"de": "die Vollzeit", "en": "full-time", "zh": "全职", "hint": "voll + Zeit = full-time", "group": "岗位条件"}, {"de": "der/die Systemadministrator/in", "en": "system administrator", "zh": "系统管理员", "hint": "≈ system administrator", "group": "岗位条件"}, {"de": "die Infrastruktur", "en": "infrastructure", "zh": "基础设施", "hint": "≈ infrastructure", "group": "岗位条件"}, {"de": "die Kommunikationsfähigkeit", "en": "communication skill", "zh": "交际能力", "hint": "Kommunikation + Fähigkeit", "group": "岗位条件"}, {"de": "die Flexibilität", "en": "flexibility", "zh": "灵活性", "hint": "≈ flexibility", "group": "岗位条件"}, {"de": "das Weiterbildungsangebot", "en": "training / continuing education offer", "zh": "继续教育机会", "hint": "Weiterbildung + Angebot", "group": "岗位条件"}, {"de": "das Jobticket", "en": "commuter/job ticket", "zh": "工作票；通勤票", "hint": "Job + Ticket", "group": "岗位条件"}, {"de": "der/die Beschäftigte", "en": "employee", "zh": "雇员；员工", "hint": "beschäftigt → Beschäftigte", "group": "岗位条件"}, {"de": "das Inland", "en": "domestic country / home country", "zh": "本国；国内", "hint": "in + Land", "group": "岗位条件"}, {"de": "die Marke", "en": "brand", "zh": "品牌", "hint": "Marke ≈ mark/brand", "group": "岗位条件"}, {"de": "der/die Produktmanager/in", "en": "product manager", "zh": "产品经理", "hint": "≈ product manager", "group": "岗位条件"}, {"de": "die Beobachtung", "en": "observation", "zh": "观察", "hint": "beobachten → Beobachtung", "group": "营销与面试"}, {"de": "die Analyse", "en": "analysis", "zh": "分析", "hint": "≈ analysis", "group": "营销与面试"}, {"de": "der Markttrend", "en": "market trend", "zh": "市场趋势", "hint": "Markt + Trend", "group": "营销与面试"}, {"de": "interkulturell", "en": "intercultural", "zh": "跨文化的", "hint": "inter + kulturell", "group": "营销与面试"}, {"de": "das Bewerbungsgespräch", "en": "job interview", "zh": "工作面试；应聘面试", "hint": "Bewerbung + Gespräch", "group": "营销与面试"}, {"de": "der/die Teamleiter/in", "en": "team leader", "zh": "团队负责人", "hint": "Team + Leiter", "group": "营销与面试"}, {"de": "die Wirtschaft", "en": "economy", "zh": "经济", "hint": "Wirtschaft = economy/business", "group": "营销与面试"}, {"de": "die Unterrichtssprache", "en": "language of instruction", "zh": "授课语言", "hint": "Unterricht + Sprache", "group": "营销与面试"}, {"de": "das Marketingkonzept", "en": "marketing concept", "zh": "营销理念", "hint": "Marketing + Konzept", "group": "营销与面试"}, {"de": "vermarkten", "en": "market / promote", "zh": "销售；营销", "hint": "Markt → vermarkten", "group": "营销与面试"}, {"de": "nachdem", "en": "after", "zh": "在……之后", "hint": "nach = after", "group": "营销与面试"}, {"de": "die Selbstpräsentation", "en": "self-presentation", "zh": "自我介绍；自我展示", "hint": "Selbst + Präsentation", "group": "营销与面试"}, {"de": "der Zeitdruck", "en": "time pressure", "zh": "时间压力", "hint": "Zeit + Druck", "group": "营销与面试"}, {"de": "die Teamsitzung", "en": "team meeting", "zh": "团队会议", "hint": "Team + Sitzung", "group": "会议"}, {"de": "die Tagesordnung", "en": "agenda", "zh": "日程安排", "hint": "Tag + Ordnung = order of the day", "group": "会议"}, {"de": "vegan", "en": "vegan", "zh": "纯素的", "hint": "≈ vegan", "group": "会议"}, {"de": "entweder ... oder ...", "en": "either ... or ...", "zh": "要么……要么……", "hint": "对应 English either...or...", "group": "会议"}, {"de": "die Werbeaktion", "en": "promotion / ad campaign", "zh": "广告宣传活动", "hint": "Werbe + Aktion", "group": "会议"}, {"de": "der/die Influencer/in", "en": "influencer", "zh": "有影响力的人；网红", "hint": "≈ influencer", "group": "会议"}, {"de": "zurückschicken", "en": "send back / return", "zh": "寄回；退回", "hint": "zurück + schicken", "group": "会议"}, {"de": "das Ergebnisprotokoll", "en": "results minutes", "zh": "会议结果记录", "hint": "Ergebnis + Protokoll", "group": "会议"}, {"de": "die Sitzungsleitung", "en": "meeting chair / leadership", "zh": "会议主持", "hint": "Sitzung + Leitung", "group": "会议"}, {"de": "der Tagesordnungspunkt", "en": "agenda item", "zh": "议程事项", "hint": "Tagesordnung + Punkt", "group": "会议"}, {"de": "abwesend", "en": "absent", "zh": "不在场；缺席", "hint": "ab = away", "group": "会议"}, {"de": "der Ärger", "en": "anger / annoyance", "zh": "生气；恼火", "hint": "Ärger = anger", "group": "会议"}, {"de": "sich aufregen", "en": "get upset / angry", "zh": "发怒；生气", "hint": "aufregen = upset", "group": "会议"}, {"de": "die Absicht", "en": "intention", "zh": "意图", "hint": "Absicht = intention", "group": "沟通"}, {"de": "die Verzeihung", "en": "forgiveness / pardon", "zh": "原谅；抱歉", "hint": "Verzeihung! = Pardon!", "group": "沟通"}, {"de": "das Verständnis", "en": "understanding", "zh": "理解", "hint": "verstehen → Verständnis", "group": "沟通"}, {"de": "das Missverständnis", "en": "misunderstanding", "zh": "误解", "hint": "Miss- + Verständnis", "group": "沟通"}, {"de": "bemerken", "en": "notice", "zh": "发觉；注意到", "hint": "merken → bemerken", "group": "沟通"}, {"de": "der Vorwurf", "en": "reproach / accusation", "zh": "责备；指责", "hint": "vorwerfen → Vorwurf", "group": "沟通"}, {"de": "die Viertelstunde", "en": "quarter of an hour", "zh": "一刻钟", "hint": "Viertel + Stunde", "group": "沟通"}, {"de": "unordentlich", "en": "untidy / messy", "zh": "不整洁的", "hint": "un- + ordentlich", "group": "沟通"}, {"de": "aufmerksam", "en": "attentive", "zh": "注意的；聚精会神的", "hint": "aufmerksam zuhören", "group": "沟通"}, {"de": "unklar", "en": "unclear", "zh": "不清楚的", "hint": "un- + klar", "group": "沟通"}, {"de": "ignorieren", "en": "ignore", "zh": "忽视；无视", "hint": "≈ ignore", "group": "沟通"}, {"de": "der Erdbeerkuchen", "en": "strawberry cake", "zh": "草莓蛋糕", "hint": "Erdbeere + Kuchen", "group": "沟通"}, {"de": "der Käsekuchen", "en": "cheesecake", "zh": "奶酪蛋糕", "hint": "Käse + Kuchen", "group": "沟通"}, {"de": "die Masterarbeit", "en": "master's thesis", "zh": "硕士论文", "hint": "Master + Arbeit", "group": "沟通"}, {"de": "allerdings", "en": "however / admittedly", "zh": "然而；不过", "hint": "≈ however / though", "group": "沟通"}];const K='unit8_vocab_v2';let S=JSON.parse(localStorage.getItem(K)||'{}'),filter='all',quiz=[],qi=0,allOpen=false;
+function save(){localStorage.setItem(K,JSON.stringify(S));stats()}function stats(){let m=0,w=0;DATA.forEach((x,i)=>{if(S[i]=='m')m++;if(S[i]=='w')w++});document.getElementById('stats').textContent=`已掌握 ${m} ｜ 易错 ${w} ｜ 共 ${DATA.length} 词`}
+function render(){let root=document.getElementById('sections');root.innerHTML='';[...new Set(DATA.map(x=>x.group))].forEach(g=>{let a=DATA.map((x,i)=>({...x,i})).filter(x=>x.group==g&&(filter=='all'||S[x.i]=='w'));if(!a.length)return;let sec=document.createElement('section');sec.className='section';sec.innerHTML=`<h2>${g}</h2><div class="grid"></div>`;let grid=sec.querySelector('.grid');a.forEach(x=>{let c=document.createElement('div');c.className='card';c.innerHTML=`<div class="de"><span>${x.de}</span><button class="speak" title="播放德语发音" aria-label="播放德语发音" onclick="speakGerman(event, '${x.de.replace(/'/g, "\\'")}')">🔊</button></div><div class="tag">先看意思和提示，再自己打一遍德语</div><div class="reveal"><div class="en">EN: ${x.en}</div><div class="zh">中：${x.zh}</div><div class="hint">🧠 ${x.hint}</div></div>
+<div class="practice">
+<input id="type-${x.i}" placeholder="请自己打一遍这个德语词" onkeydown="if(event.key==='Enter')checkCard(${x.i})" onclick="event.stopPropagation()">
+<div class="chars" onclick="event.stopPropagation()">
+<button onclick="insertChar(${x.i},'ä')">ä</button><button onclick="insertChar(${x.i},'ö')">ö</button><button onclick="insertChar(${x.i},'ü')">ü</button><button onclick="insertChar(${x.i},'ß')">ß</button>
+<button onclick="insertChar(${x.i},'Ä')">Ä</button><button onclick="insertChar(${x.i},'Ö')">Ö</button><button onclick="insertChar(${x.i},'Ü')">Ü</button>
+</div>
+<div style="display:flex;gap:7px;margin-top:7px" onclick="event.stopPropagation()"><button class="primary" style="flex:1" onclick="checkCard(${x.i})">检查拼写</button><button style="flex:1" onclick="clearCard(${x.i})">重写</button></div>
+<div class="practice-msg" id="msg-${x.i}"></div>
+</div>
+<div class="actions"><button class="weak ${S[x.i]=='w'?'on':''}" onclick="mark(event,${x.i},'w')">易错</button><button id="master-${x.i}" class="master ${S[x.i]=='m'?'on':''}" onclick="mark(event,${x.i},'m')" ${S[x.i]=='m'?'':'disabled'}>记住了</button></div>`;c.onclick=e=>{if(e.target.tagName!='BUTTON')c.classList.toggle('open')};grid.appendChild(c)});root.appendChild(sec)});stats()}
+
+function normalizeGerman(s){
+  return s.toLowerCase()
+    .replace(/[.,;()\/]/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function acceptedCardForms(de){
+  const raw = de;
+  const forms = new Set();
+  forms.add(normalizeGerman(raw));
+  let noArticle = raw.replace(/^(der\/die|der|die|das)\s+/i,'');
+  forms.add(normalizeGerman(noArticle));
+  let singular = noArticle.split(',')[0].trim();
+  forms.add(normalizeGerman(singular));
+  forms.add(normalizeGerman(raw.split(',')[0].trim()));
+  return [...forms].filter(Boolean);
+}
+function insertChar(i,ch){
+  const inp=document.getElementById('type-'+i);
+  const start=inp.selectionStart??inp.value.length, end=inp.selectionEnd??inp.value.length;
+  inp.value=inp.value.slice(0,start)+ch+inp.value.slice(end);
+  inp.focus(); inp.setSelectionRange(start+ch.length,start+ch.length);
+}
+function clearCard(i){
+  const inp=document.getElementById('type-'+i);
+  inp.value=''; inp.focus();
+  const msg=document.getElementById('msg-'+i); msg.textContent=''; msg.className='practice-msg';
+}
+function checkCard(i){
+  const inp=document.getElementById('type-'+i);
+  const val=normalizeGerman(inp.value);
+  const forms=acceptedCardForms(DATA[i].de);
+  const msg=document.getElementById('msg-'+i);
+  const ok=forms.includes(val);
+  if(ok){
+    msg.className='practice-msg ok';
+    msg.textContent='✓ 拼写正确，现在可以点“记住了”';
+    const b=document.getElementById('master-'+i); if(b) b.disabled=false;
+  }else{
+    msg.className='practice-msg no';
+    msg.textContent='再检查一下拼写，尤其注意 ä / ö / ü / ß。';
+    S[i]='w'; save();
+  }
+}
+function mark(e,i,v){
+  e.stopPropagation();
+  if(v==='m' && S[i]!=='m'){
+    const b=document.getElementById('master-'+i);
+    if(b && b.disabled) return;
+  }
+  S[i]=S[i]==v?'':v;save();render()
+}function showWeak(){filter='weak';render()}function showAll(){filter='all';render()}function toggleAll(){allOpen=!allOpen;document.querySelectorAll('.card').forEach(c=>c.classList.toggle('open',allOpen))}
+
+function insertQuizChar(ch){
+  const inp=document.getElementById('answer');
+  const start=inp.selectionStart??inp.value.length, end=inp.selectionEnd??inp.value.length;
+  inp.value=inp.value.slice(0,start)+ch+inp.value.slice(end);
+  inp.focus(); inp.setSelectionRange(start+ch.length,start+ch.length);
+}
+function startQuiz(){let w=DATA.map((x,i)=>i).filter(i=>S[i]=='w'),r=DATA.map((x,i)=>i).filter(i=>S[i]!='w').sort(()=>Math.random()-.5);quiz=[...w.sort(()=>Math.random()-.5),...r].slice(0,10);qi=0;next()}
+function next(){if(qi>=quiz.length){prompt.textContent='完成！现在只练“易错词”，效果最好。';bridge.textContent='';return}let x=DATA[quiz[qi]],m=Math.random()<.5?'zh':'en';prompt.textContent=x[m];bridge.textContent=m=='zh'?`English bridge: ${x.en}`:`中文提示：${x.zh}`;answer.value='';answer.focus();feedback.textContent=''}
+function n(s){return s.toLowerCase().replace(/[.,;()\/]/g,' ').replace(/\s+/g,' ').trim()}function checkAnswer(){if(!quiz.length||qi>=quiz.length)return;let i=quiz[qi],x=DATA[i],a=n(answer.value),t=n(x.de);let ok=a==t||t.endsWith(' '+a)||(t.includes('/')&&a.length>4&&t.includes(a));if(ok){feedback.className='feedback ok';feedback.innerHTML='✓ 正确：'+x.de+' <button class="speak" title="播放德语发音" onclick="speakGerman(event, '+JSON.stringify(x.de)+')">🔊</button>';S[i]='m';save();setTimeout(()=>{qi++;next()},700)}else{feedback.className='feedback no';feedback.textContent='再想一下。提示：'+x.hint;S[i]='w';save()}}
+
+function cleanForSpeech(t){
+  return t
+    .replace(/\(mit\)/g,'')
+    .replace(/der\/die/g,'')
+    .replace(/\/in/g,'')
+    .replace(/\.\.\./g,' ')
+    .replace(/,/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function speakGerman(e,t){
+  if(e){e.stopPropagation();e.preventDefault();}
+  if(!('speechSynthesis' in window)){
+    alert('当前浏览器不支持语音朗读，请使用 Chrome、Edge 或 Safari 打开。');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(cleanForSpeech(t));
+  u.lang='de-DE';
+  u.rate=0.82;
+  u.pitch=1;
+  const voices=window.speechSynthesis.getVoices();
+  const de=voices.find(v=>/^de(-|_)/i.test(v.lang)) || voices.find(v=>/German/i.test(v.name));
+  if(de) u.voice=de;
+  window.speechSynthesis.speak(u);
+}
+function showAnswer(){if(!quiz.length||qi>=quiz.length)return;let i=quiz[qi];feedback.className='feedback no';feedback.innerHTML='答案：'+DATA[i].de+' <button class="speak" title="播放德语发音" onclick="speakGerman(event, '+JSON.stringify(DATA[i].de)+')">🔊</button>';S[i]='w';save();setTimeout(()=>{qi++;next()},1200)}render();
+</script></body></html>
