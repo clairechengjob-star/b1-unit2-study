@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Unit 9 德语单词背诵训练</title>
+<style>
+:root{--b:#f5f7fb;--c:#fff;--t:#172033;--m:#6b7280;--p:#3157d5;--l:#e5e7eb;--ok:#166534;--bad:#991b1b}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial;background:var(--b);color:var(--t)}
+header{position:sticky;top:0;z-index:9;background:#fffffff2;backdrop-filter:blur(10px);border-bottom:1px solid var(--l);padding:14px}
+.head,main{max-width:1080px;margin:auto}.head{display:flex;justify-content:space-between;align-items:center;gap:12px}h1{font-size:20px;margin:0}.sub{font-size:12px;color:var(--m);margin-top:3px}
+main{padding:16px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.stat,.card,.box{background:#fff;border:1px solid var(--l);border-radius:17px}.stat{padding:12px}.stat b{display:block;font-size:23px}.stat span{font-size:12px;color:var(--m)}
+.tabs{display:flex;gap:7px;overflow:auto;padding:14px 0}.tabs button{white-space:nowrap}.tab.on{background:var(--p);color:white}.panel{display:none}.panel.on{display:block}
+button,select,input{font:inherit}button{border:0;border-radius:11px;padding:10px 12px;font-weight:700;background:#e9edf5}button.primary{background:var(--p);color:#fff}button.spk{font-size:18px;background:#eef2ff;color:#1d4ed8}button.good{background:#dcfce7;color:var(--ok)}button.bad{background:#fee2e2;color:var(--bad)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}select,input{border:1px solid var(--l);border-radius:11px;background:#fff;padding:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{padding:15px}.top{display:flex;justify-content:space-between;gap:8px}.de{font-size:21px;font-weight:850}.zh{font-size:16px;font-weight:750;margin-top:8px}.en{color:var(--m);margin-top:3px}.meta{font-size:12px;color:var(--m);margin-top:7px}.hint{font-size:13px;background:#fff7ed;padding:9px;border-radius:10px;margin-top:9px}
+.box{padding:20px;min-height:360px}.center{text-align:center}.big{font-size:35px;font-weight:900;margin:25px 0}.meaning{font-size:21px;line-height:1.55;margin:18px}.hidden{display:none!important}
+.bar{height:9px;background:#e5e7eb;border-radius:10px;overflow:hidden;margin:8px 0 18px}.bar>div{height:100%;background:var(--p);width:0}
+.dictPrompt{font-size:22px;font-weight:800;padding:20px;text-align:center}.dictInput{width:min(650px,100%);font-size:22px;text-align:center;padding:14px}.card .feedback{max-width:none}.feedback{display:none;max-width:700px;margin:14px auto;padding:12px;border-radius:12px}.feedback.ok{display:block;background:#dcfce7;color:var(--ok)}.feedback.no{display:block;background:#fee2e2;color:var(--bad)}
+.wrong{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--l)}.empty{text-align:center;color:var(--m);padding:50px}
+.small{font-size:12px;color:var(--m)}li{margin:8px 0;line-height:1.55}footer{text-align:center;color:var(--m);font-size:12px;padding:26px}
+@media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}main{padding:11px}h1{font-size:17px}}
+
+.mcqPrompt{font-size:34px;font-weight:900;text-align:center;margin:8px 0 10px;line-height:1.3}
+.mcqSub{font-size:16px;color:var(--muted);text-align:center;margin-bottom:12px}
+.mcqMeta{font-size:13px;color:var(--muted);text-align:center;margin-bottom:10px}
+.mcqOptions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.mcqOpt{width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;cursor:pointer}
+.mcqOpt:hover{border-color:#c7d2fe;box-shadow:0 2px 10px rgba(49,87,213,.08)}
+.mcqOpt.correct{background:#dcfce7;border-color:#86efac}
+.mcqOpt.wrong{background:#fee2e2;border-color:#fca5a5}
+.optMain{font-size:20px;font-weight:800;line-height:1.35}
+.optSub{font-size:12px;color:var(--muted);margin-top:5px}
+@media (max-width:780px){.mcqOptions{grid-template-columns:1fr}.mcqPrompt{font-size:26px}}
+
+</style></head>
+<body>
+<header><div class="head"><div><h1>Unit 9 德语单词背诵训练</h1><div class="sub">德语小白版｜德-中-英｜喇叭｜默写｜选择题｜打一遍｜自动错题集｜iPad 友好</div></div><button class="primary" onclick="speak('Willkommen! Wir lernen heute Deutsch.')">🔊 试音</button></div></header>
+<main>
+<div class="stats"><div class="stat"><b id="nAll"></b><span>全部词条</span></div><div class="stat"><b id="nKnow"></b><span>已会</span></div><div class="stat"><b id="nWrong"></b><span>错题</span></div><div class="stat"><b id="acc"></b><span>默写正确率</span></div></div>
+<div class="tabs"><button class="tab on" data-id="list">📚 单词总表</button><button class="tab" data-id="flash">🧠 闪卡</button><button class="tab" data-id="dict">✍️ 默写</button><button class="tab" data-id="mcq">📝 选择题</button><button class="tab" data-id="copy">⌨️ 打一遍</button><button class="tab" data-id="wrong">❌ 错题集</button><button class="tab" data-id="plan">🎯 背诵计划</button></div>
+
+<section id="list" class="panel on"><div class="toolbar">
+<select id="pf"><option value="all">全部页码</option><option>58</option><option>59</option><option>60</option><option>61</option><option>62</option><option>63</option><option>64</option><option value="补充">补充词汇</option></select>
+<input id="q" placeholder="搜索德语 / 中文 / English">
+</div><div id="grid" class="grid"></div></section>
+
+<section id="flash" class="panel"><div class="box"><div class="toolbar"><select id="fs"><option value="all">全部词</option><option value="wrong">只背错题</option><option value="new">只背未掌握</option></select><button onclick="startFlash()">重新洗牌</button></div><div class="bar"><div id="fb"></div></div><div class="center"><div class="small" id="fm"></div><div class="big" id="fd">点“重新洗牌”开始</div><button class="spk" onclick="if(cf)speak(cf[0])">🔊</button><div id="fans" class="hidden"><div class="meaning" id="fmean"></div><div class="hint" id="fh"></div></div><div style="margin-top:16px"><button id="rev" onclick="reveal()">显示答案</button><button id="yes" class="good hidden" onclick="rate(true)">✅ 会</button><button id="no" class="bad hidden" onclick="rate(false)">❌ 不会</button></div></div></div></section>
+
+<section id="dict" class="panel"><div class="box"><div class="toolbar">
+<select id="dm"><option value="zh">中文 → 德语</option><option value="audio">听音 → 德语</option><option value="en">English → 德语</option></select>
+<select id="ds"><option value="all">全部词</option><option value="wrong">只练错题</option><option value="new">只练未掌握</option></select><button onclick="startDict()">开始 / 换一组</button></div>
+<div class="bar"><div id="db"></div></div><div class="dictPrompt" id="dp">先选择模式，然后点击“开始 / 换一组”</div><div class="center"><button class="spk" onclick="if(cd)speak(cd[0])">🔊 再听一次</button><br><br><input id="di" class="dictInput" autocomplete="off" autocapitalize="off" placeholder="输入德语（检查后手动点“下一题”）"><br><br><button class="primary" onclick="check()">检查答案</button> <button onclick="showAns()">不会，显示答案</button> <button id="nextDictBtn" onclick="manualNextDict()" disabled>➡️ 下一题</button></div><div id="feed" class="feedback"></div></div></section>
+
+
+
+<section id="mcq" class="panel"><div class="box"><div class="toolbar">
+<select id="qm"><option value="en2de">看英文选德文</option><option value="de2en">看德文选英文</option></select>
+<select id="qs"><option value="all">全部词</option><option value="wrong">只练错题</option><option value="new">只练未掌握</option></select>
+<button onclick="startQuiz()">开始 / 换一组</button></div>
+<div class="bar"><div id="qb"></div></div>
+<div class="mcqMeta" id="qmeta">先选择模式，然后点击“开始 / 换一组”</div>
+<div class="mcqPrompt" id="qp">选择题</div>
+<div class="mcqSub" id="qsub">这里会显示英文或中文提示</div>
+<div class="center"><button class="spk" onclick="if(cq)speak(cq[0])">🔊 听德语</button></div>
+<div id="qopts" class="mcqOptions"></div>
+<div id="qfeed" class="feedback"></div>
+<div class="center" style="margin-top:16px">
+  <button onclick="showQuizAns()">不会，显示答案</button>
+  <button id="qnext" class="primary" onclick="nextQuizManual()" disabled>➡️ 下一题</button>
+</div>
+</div></section>
+
+<section id="copy" class="panel">
+  <div class="box">
+    <div class="toolbar">
+      <select id="cs">
+        <option value="all">全部词</option>
+        <option value="wrong">只打错题</option>
+        <option value="new">只打未掌握</option>
+      </select>
+      <button class="primary" onclick="startCopy()">开始 / 重新开始</button>
+    </div>
+
+    <div class="bar"><div id="cb"></div></div>
+
+    <div class="center">
+      <div class="small" id="cm">看着德语，亲手完整打一遍</div>
+      <div class="big" id="cw">点击“开始 / 重新开始”</div>
+      <button class="spk" onclick="if(cc)speak(cc[0])">🔊 听发音</button>
+
+      <div class="meaning" id="cmean"></div>
+
+      <input id="ci" class="dictInput"
+             autocomplete="off" autocapitalize="off"
+             placeholder="请照着上面的德语完整输入一遍">
+
+      <div style="margin-top:14px">
+        <button class="primary" onclick="checkCopy()">检查输入</button>
+        <button onclick="copyAgainLater()">这个词稍后再来一次</button>
+      </div>
+
+      <div id="cfeed" class="feedback"></div>
+      <div class="small" style="margin-top:12px">
+        提示：名词请连冠词一起打。打错的词会自动加入错题集，并在本轮稍后再次出现。
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="wrong" class="panel"><div class="box"><div class="toolbar"><button class="primary" onclick="goWrong()">只练错题</button><button onclick="clearWrong()">清空错题</button></div><div id="wl"></div></div></section>
+
+<section id="plan" class="panel"><div class="box"><h2>让“小白”真的背出来：7天法</h2>
+<p>目标不是“看着眼熟”，而是做到：<b>看到中文能写德语；听到德语能拼出来；名词记住冠词。</b></p>
+<ol><li><b>每天只学 15–20 个。</b>先在“单词总表”点喇叭，跟读两遍。</li><li><b>英语好的学生先借 English。</b>例如 <i>Inklusion–inclusion</i>、<i>Motivation–motivation</i>、<i>Signal–signal</i>，先建立熟悉感。</li><li><b>名词必须和冠词绑在一起。</b>不要只背 <i>Schock</i>，要背 <i>der Schock</i>。</li><li><b>复合词拆开。</b>如 <i>Rolltreppe = rollen + Treppe</i>，<i>Schallwelle = Schall + Welle</i>。</li><li><b>第一轮中文→德语，第二轮听音→德语。</b>错一次自动进入错题集。</li><li><b>第二天先刷错题，再学新词。</b>错题连续答对后会逐步减少。</li></ol>
+<h3>建议安排</h3><p>Day 1：P58–59｜Day 2：P60｜Day 3：P61｜Day 4：P62｜Day 5：P63–64 + 错题｜Day 6：全量随机默写｜Day 7：只练错题，直到正确率 ≥ 90%。</p>
+<p class="small">学习记录会保存在当前浏览器的 localStorage。同一台 iPad、同一浏览器再次打开，进度通常会保留。</p></div></section>
+</main><footer>Unit 9 · Geht nicht? Gibt’s nicht! · 教材词汇 + 2 个补充高频词</footer>
+<script>
+const V=[["vorsichtig", "小心的；谨慎的", "careful; cautious", "形容词", 58, ""], ["der Schock", "震惊；打击", "shock", "名词", 58, "die Schocks"], ["aufgeben", "放弃", "give up", "动词", 58, "gibt auf · hat aufgegeben"], ["der/die Hörakustiker/in", "听力学家；声学工作者", "hearing-aid acoustician", "名词", 58, "Hörakustiker / Hörakustikerinnen"], ["barrierefrei", "无障碍的", "barrier-free; accessible", "形容词", 58, ""], ["bewältigen", "克服；解决", "overcome; cope with", "动词", 58, "bewältigt · hat bewältigt"], ["das Handbike", "手摇自行车", "handcycle", "名词", 58, "die Handbikes"], ["das Vorbild", "榜样", "role model", "名词", 58, "die Vorbilder"], ["paralympisch", "残奥会的", "Paralympic", "形容词", 58, ""], ["die Goldmedaille", "金牌；金质奖章", "gold medal", "名词", 58, "die Goldmedaillen"], ["die Inklusion", "包容性；融合", "inclusion", "名词", 58, ""], ["verschieden", "各种各样的；不同的", "different; various", "形容词", 58, ""], ["die Behinderung", "残疾；障碍", "disability; impairment", "名词", 58, "die Behinderungen"], ["inklusiv", "包容的", "inclusive", "形容词", 58, ""], ["die Angst", "害怕；恐惧", "fear; anxiety", "名词", 58, "die Ängste"], ["die Disziplin", "项目；训练项目；纪律", "discipline; event", "名词", 59, "die Disziplinen"], ["die Konsequenz", "后果；结论", "consequence", "名词", 59, "die Konsequenzen"], ["der Vorgang", "事情过程；过程", "process; procedure", "名词", 59, "die Vorgänge"], ["die Grenze", "界限；极限；边界", "border; limit", "名词", 59, "die Grenzen"], ["das Komitee", "委员会", "committee", "名词", 59, "die Komitees"], ["das Monoski", "单板滑雪（器具）", "monoski", "名词", 59, "通常用单数"], ["der Rollstuhlbasketball", "轮椅篮球", "wheelchair basketball", "名词", 59, ""], ["die Bekleidungsfirma", "服装公司", "clothing company", "名词", 59, "die Bekleidungsfirmen"], ["die Zimmertür", "房门；屋门", "room door", "名词", 59, "die Zimmertüren"], ["herausnehmen", "取出；拿出", "take out", "动词", 59, "nimmt heraus · hat herausgenommen"], ["die Barrierefreiheit", "无障碍；畅通无阻", "accessibility", "名词", 59, ""], ["das Alltagsproblem", "日常问题", "everyday problem", "名词", 59, "die Alltagsprobleme"], ["der Gehweg", "人行道", "sidewalk; pavement", "名词", 59, "die Gehwege"], ["kritisieren", "批评", "criticize", "动词", 59, "kritisiert · hat kritisiert"], ["die Eingangstür", "大门；入口门", "entrance door", "名词", 59, "die Eingangstüren"], ["automatisch", "自动的；自动地", "automatic; automatically", "形容词/副词", 60, ""], ["der/die Pendler/in", "（乘火车等）通勤者", "commuter", "名词", 60, "Pendler / Pendlerinnen"], ["die Rolltreppe", "自动扶梯", "escalator", "名词", 60, "die Rolltreppen"], ["die Lebensqualität", "生活质量", "quality of life", "名词", 60, "die Lebensqualitäten"], ["je … desto …", "越……越……", "the … the …", "句型", 60, ""], ["der Projekttag", "活动日；项目日", "project day", "名词", 60, "die Projekttage"], ["der Sitzvolleyball", "坐式排球", "sitting volleyball", "名词", 60, ""], ["nötig", "必须的；必要的", "necessary", "形容词", 60, ""], ["arbeitsfrei", "休息的；不上班的", "off work", "形容词", 60, ""], ["sorgenfrei", "无忧无虑的", "carefree", "形容词", 60, ""], ["kostenfrei", "免费的", "free of charge", "形容词", 60, ""], ["autofrei", "无车的", "car-free", "形容词", 60, ""], ["unterrichtsfrei", "没有课的", "no classes", "形容词", 60, ""], ["stressfrei", "没有压力的", "stress-free", "形容词", 60, ""], ["schmerzfrei", "无痛的", "pain-free", "形容词", 60, ""], ["alkoholfrei", "不含酒精的", "alcohol-free", "形容词", 60, ""], ["der/das Poster", "广告画；招贴画；海报", "poster", "名词", 61, "die Poster/Posters"], ["die Rampe", "坡道；斜面", "ramp", "名词", 61, "die Rampen"], ["die Schwerhörigkeit", "重听；听力减退", "hearing loss", "名词", 61, ""], ["die Bevölkerung", "居民；人口", "population", "名词", 61, "die Bevölkerungen"], ["die Weiterbildungsmöglichkeit", "进修机会；深造机会", "further-training opportunity", "名词", 61, "die Weiterbildungsmöglichkeiten"], ["das Hörproblem", "听力问题", "hearing problem", "名词", 61, "die Hörprobleme"], ["die Motivation", "动力；动机", "motivation", "名词", 61, "die Motivationen"], ["der Hörtest", "听力测试", "hearing test", "名词", 61, "die Hörtests"], ["irgendwann", "不知什么时候；总有一天", "sometime; someday", "副词", 61, ""], ["das Ticken", "滴答声", "ticking", "名词", 61, ""], ["die Stimme", "声音；嗓音", "voice", "名词", 61, "die Stimmen"], ["undeutlich", "不清楚的", "unclear; indistinct", "形容词", 61, ""], ["unpersönlich", "无人称的；非个人的", "impersonal", "形容词", 61, ""], ["die Stille", "寂静；宁静", "silence; stillness", "名词", 61, ""], ["das Gehirn", "脑；大脑", "brain", "名词", 62, "die Gehirne"], ["die Schnecke", "蜗牛", "snail", "名词", 62, "die Schnecken"], ["gehörlos", "无听觉的；失聪的", "deaf", "形容词", 62, ""], ["das Außenohr", "外耳", "outer ear", "名词", 62, "die Außenohren"], ["das Innenohr", "内耳", "inner ear", "名词", 62, "die Innenohren"], ["das Trommelfell", "鼓膜；耳膜", "eardrum", "名词", 62, "die Trommelfelle"], ["die Hörschnecke", "耳蜗", "cochlea", "名词", 62, "die Hörschnecken"], ["das Mittelohr", "中耳", "middle ear", "名词", 62, "die Mittelohren"], ["die Schallwelle", "声波", "sound wave", "名词", 62, "die Schallwellen"], ["das Gehörknöchelchen", "听小骨", "auditory ossicle", "名词", 62, "die Gehörknöchelchen"], ["das Signal", "信号", "signal", "名词", 62, "die Signale"], ["die Entfernung", "距离；间距", "distance", "名词", 62, "die Entfernungen"], ["klatschen", "拍手；鼓掌", "clap", "动词", 62, "klatscht · hat geklatscht"], ["auffangen", "接住；截取", "catch; intercept", "动词", 62, "fängt auf · hat aufgefangen"], ["sogenannt", "所谓的", "so-called", "形容词", 62, ""], ["die Orientierung", "定位；方向", "orientation; navigation", "名词", 62, "die Orientierungen"], ["nebeneinander", "并排；并列", "side by side", "副词", 63, ""], ["der Rand", "边缘", "edge; rim", "名词", 63, "die Ränder"], ["tauchen", "潜水", "dive", "动词", 63, "taucht · hat/ist getaucht"], ["befestigen", "固定", "fasten; attach", "动词", 63, "befestigt · hat befestigt"], ["wickeln (um)", "卷；绕", "wrap around", "动词", 63, "wickelt (um) · hat (um)gewickelt"], ["der Luftballon", "气球", "balloon", "名词", 63, "die Luftballons"], ["der Secondhandladen", "旧货商店；二手货商店", "second-hand shop", "名词", 64, "die Secondhandläden"], ["hilfsbereit", "乐于助人的", "helpful", "形容词", 64, ""], ["verständnisvoll", "充分理解的；善解人意的", "understanding", "形容词", 64, ""], ["verantwortungsvoll", "责任重大的；有责任心的", "responsible", "形容词", 64, ""],
+["gerade", "刚刚；现在正在", "just; right now", "副词", "补充", "例：Ich habe gerade meine Arbeit erledigt. = 我刚刚把工作做完。"],
+["erledigen", "完成；处理；办完", "finish; complete; get done", "动词", "补充", "erledigt · hat erledigt｜例：Ich habe meine Arbeit erledigt. = 我把工作做完了。"]];
+const K='unit9_cn_beginner_v2';
+let S=JSON.parse(localStorage.getItem(K)||'{"know":[],"wrong":{},"ok":0,"total":0}');
+let deck=[],fi=0,cf=null,ddeck=[],di=0,cd=null,qdeck=[],qi=0,cq=null,qAnswered=false,cdeck=[],ci=0,cc=null;
+const $=x=>document.getElementById(x);
+function save(){localStorage.setItem(K,JSON.stringify(S));stats();renderWrong()}
+function speak(t){if(!('speechSynthesis'in window)){alert('浏览器不支持语音。请用 Safari 或 Chrome。');return}speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='de-DE';u.rate=.78;let vv=speechSynthesis.getVoices();let dv=vv.find(x=>(x.lang||'').toLowerCase().startsWith('de'));if(dv)u.voice=dv;speechSynthesis.speak(u)}
+function stats(){$('nAll').textContent=V.length;$('nKnow').textContent=S.know.length;$('nWrong').textContent=Object.keys(S.wrong).length;$('acc').textContent=S.total?Math.round(S.ok/S.total*100)+'%':'—'}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function memory(w){let d=w[0],e=w[2];
+if(d==='gerade')return 'gerade + 现在时：正在；gerade + 完成时：刚刚。例：Ich arbeite gerade. / Ich habe gerade gegessen.';
+if(d==='erledigen')return '英语联想 finish / complete / get something done。完成时：haben + erledigt。';if(/frei$/.test(d))return '看到 -frei：没有……的 / free of …。';if(/voll$/.test(d))return '看到 -voll：充满……的；英语可联想 full。';if(/los$/.test(d))return '看到 -los：没有……的；类似 English -less。';if(/un/.test(d)&&['undeutlich','unpersönlich'].includes(d))return 'un- = 不、非。';if(/[A-Za-z]/.test(e)&&d.toLowerCase().replace(/^(der|die|das) /,'').includes(e.toLowerCase().split(/[; -]/)[0].slice(0,5)))return '和 English 很接近，先借英语建立联想。';if(d.includes('Hör'))return 'Hör- 来自 hören（听），看到它先想到“听觉/听力”。';if(d.includes('Tür'))return 'Tür = 门；复合词先拆开记。';if(d.includes('Ohr'))return 'Ohr = 耳朵；Außen=外，Innen=内，Mittel=中。';return '先读音，再把德语和中文意思绑定；复合词尽量拆开记。'}
+function render(){let p=$('pf').value,q=$('q').value.trim().toLowerCase();let a=V.filter(w=>(p==='all'||String(w[4])===p)&&(!q||w.slice(0,4).join(' ').toLowerCase().includes(q)));$('grid').innerHTML=a.map(w=>{let i=V.indexOf(w),kn=S.know.includes(i);return `<div class="card"><div class="top"><div><div class="de">${esc(w[0])}</div><div class="meta">P.${w[4]} · ${esc(w[3])}</div></div><button class="spk" onclick="speak(V[${i}][0])">🔊</button></div><div class="zh">${esc(w[1])}</div><div class="en">English: ${esc(w[2])}</div>${w[5]?`<div class="meta">📌 ${esc(w[5])}</div>`:''}<div class="hint">🧩 ${esc(memory(w))}</div><div style="margin-top:9px"><button class="${kn?'good':''}" onclick="toggle(${i})">${kn?'✅ 已会':'○ 标记为会'}</button></div><div style="margin-top:14px;padding-top:14px;border-top:1px solid #e5e7eb"><div class="meta" style="margin-bottom:7px">⌨️ 看着上面的单词，亲手打一遍</div><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="cardInput_${i}" type="text" autocomplete="off" autocapitalize="off" placeholder="在这里完整输入" style="flex:1;min-width:210px;font-size:16px;padding:11px 12px;border:1px solid #d1d5db;border-radius:12px" onkeydown="if(event.key==='Enter')checkCardTyping(${i})"><button class="primary" onclick="checkCardTyping(${i})">检查</button><button onclick="clearCardTyping(${i})">重打</button></div><div id="cardFeedback_${i}" class="feedback" style="margin:8px 0 0"></div></div></div>`}).join('')}
+function checkCardTyping(i){
+  let w=V[i],input=$('cardInput_'+i),fb=$('cardFeedback_'+i);
+  if(!w||!input||!fb)return;
+  let a=input.value,exact=n(a)===n(w[0]),near=loose(a)===loose(w[0]);
+  if(exact){
+    fb.className='feedback ok';
+    fb.innerHTML=`✅ 正确！你已经亲手打了一遍：<b>${esc(w[0])}</b>`;
+    if(!S.know.includes(i))S.know.push(i);
+    if((S.wrong[i]||0)>0){S.wrong[i]--;if(S.wrong[i]<=0)delete S.wrong[i]}
+    save();
+  }else{
+    fb.className='feedback no';
+    fb.innerHTML=`❌ 再打一遍。正确写法：<b>${esc(w[0])}</b>${near?'<br>已经很接近了，检查 ä / ö / ü / ß、冠词和大小写。':'<br>请对照上面的德语，一个字母一个字母重新输入。'}`;
+    S.wrong[i]=(S.wrong[i]||0)+1;
+    S.know=S.know.filter(x=>x!==i);
+    save();
+    input.select();
+  }
+  renderWrong();
+}
+function clearCardTyping(i){
+  let input=$('cardInput_'+i),fb=$('cardFeedback_'+i);
+  if(input){input.value='';input.focus()}
+  if(fb){fb.className='feedback';fb.textContent=''}
+}
+function toggle(i){S.know=S.know.includes(i)?S.know.filter(x=>x!==i):[...S.know,i];save();render()}
+function pool(sc){if(sc==='wrong')return Object.keys(S.wrong).map(Number).map(i=>V[i]).filter(Boolean);if(sc==='new')return V.filter((w,i)=>!S.know.includes(i));return V}
+function mix(a){return [...a].sort(()=>Math.random()-.5)}
+function startFlash(){deck=mix(pool($('fs').value));fi=0;nextFlash()}
+function nextFlash(){if(!deck.length){$('fd').textContent='这个范围暂时没有词';return}if(fi>=deck.length)fi=0;cf=deck[fi];$('fd').textContent=cf[0];$('fm').textContent=`P.${cf[4]} · ${cf[3]} · ${fi+1}/${deck.length}`;$('fmean').textContent=cf[1]+' ｜ '+cf[2];$('fh').textContent='🧩 '+memory(cf)+(cf[5]?' ｜ '+cf[5]:'');$('fans').classList.add('hidden');$('rev').classList.remove('hidden');$('yes').classList.add('hidden');$('no').classList.add('hidden');$('fb').style.width=(fi/deck.length*100)+'%'}
+function reveal(){$('fans').classList.remove('hidden');$('rev').classList.add('hidden');$('yes').classList.remove('hidden');$('no').classList.remove('hidden')}
+function rate(ok){let i=V.indexOf(cf);if(ok){if(!S.know.includes(i))S.know.push(i)}else{S.know=S.know.filter(x=>x!==i);S.wrong[i]=(S.wrong[i]||0)+1}save();fi++;nextFlash()}
+function startDict(){ddeck=mix(pool($('ds').value));di=0;nextDict()}
+function nextDict(){$('nextDictBtn').disabled=true;if(!ddeck.length){$('dp').textContent='这个范围暂时没有词';cd=null;return}if(di>=ddeck.length){$('dp').textContent='这一轮完成！点击“开始 / 换一组”再来一轮。';$('db').style.width='100%';cd=null;return}cd=ddeck[di];let m=$('dm').value;$('dp').textContent=m==='zh'?cd[1]:m==='en'?cd[2]:'🔊 听音后写出德语';$('di').value='';$('feed').className='feedback';$('db').style.width=(di/ddeck.length*100)+'%';if(m==='audio')setTimeout(()=>speak(cd[0]),200);$('di').focus()}
+function n(s){return s.trim().toLowerCase().replace(/\s+/g,' ')}function loose(s){return n(s).replaceAll('ä','ae').replaceAll('ö','oe').replaceAll('ü','ue').replaceAll('ß','ss')}
+function check(){if(!cd)return;let a=$('di').value,ex=n(a)===n(cd[0]),near=loose(a)===loose(cd[0]),i=V.indexOf(cd),f=$('feed');S.total++;if(ex){S.ok++;f.className='feedback ok';f.innerHTML=`✅ 正确：<b>${esc(cd[0])}</b> = ${esc(cd[1])}`;if((S.wrong[i]||0)>0){S.wrong[i]--;if(S.wrong[i]<=0)delete S.wrong[i]}if(!S.know.includes(i))S.know.push(i)}else{S.wrong[i]=(S.wrong[i]||0)+1;S.know=S.know.filter(x=>x!==i);f.className='feedback no';f.innerHTML=`❌ 你的答案：<b>${esc(a||'（空白）')}</b><br>正确：<b>${esc(cd[0])}</b><br>${near?'很接近：重点检查 ä/ö/ü、ß 或冠词。':'重点检查冠词、拼写和可分动词。'}`}save();$('nextDictBtn').disabled=false;}
+function showAns(){if(!cd)return;let i=V.indexOf(cd);S.total++;S.wrong[i]=(S.wrong[i]||0)+1;S.know=S.know.filter(x=>x!==i);let f=$('feed');f.className='feedback no';f.innerHTML=`答案：<b>${esc(cd[0])}</b><br>${esc(cd[1])} ｜ ${esc(cd[2])}`;save();$('nextDictBtn').disabled=false;}
+function manualNextDict(){if(!cd)return;di++;nextDict();}
+
+
+function uniqChoiceDeck(cur){
+  let ids=[V.indexOf(cur)];
+  while(ids.length<4 && ids.length<V.length){
+    let r=Math.floor(Math.random()*V.length);
+    if(!ids.includes(r)) ids.push(r);
+  }
+  return mix(ids.map(i=>V[i]));
+}
+function renderQuizOptions(opts, mode){
+  $('qopts').innerHTML = opts.map(w=>{
+    let isDe = mode==='en2de';
+    let main = isDe ? esc(w[0]) : esc(w[2]);
+    let sub = isDe ? esc(w[1] + ' · ' + w[2]) : esc(w[1]);
+    let idx = V.indexOf(w);
+    return `<button class="mcqOpt" data-idx="${idx}" onclick="answerQuiz(${idx})"><div class="optMain">${main}</div><div class="optSub">${sub}</div></button>`;
+  }).join('');
+}
+function lockQuizOptions(){
+  document.querySelectorAll('#qopts .mcqOpt').forEach(b=>b.disabled=true);
+}
+function markQuizOptions(correctIdx, chosenIdx){
+  document.querySelectorAll('#qopts .mcqOpt').forEach(b=>{
+    let idx=Number(b.dataset.idx);
+    if(idx===correctIdx) b.classList.add('correct');
+    if(chosenIdx!==null && idx===chosenIdx && idx!==correctIdx) b.classList.add('wrong');
+    b.disabled=true;
+  });
+}
+function startQuiz(){qdeck=mix(pool($('qs').value));qi=0;nextQuiz();}
+function nextQuiz(){
+  $('qnext').disabled=true;
+  qAnswered=false;
+  $('qfeed').className='feedback';
+  $('qfeed').textContent='';
+  if(!qdeck.length){$('qmeta').textContent='这个范围暂时没有词';$('qp').textContent='没有可练习的词';$('qsub').textContent='';$('qopts').innerHTML='';cq=null;return}
+  if(qi>=qdeck.length){$('qmeta').textContent='这一轮完成！';$('qp').textContent='🎉 选择题完成';$('qsub').textContent='可以再来一轮，或者去练默写 / 打一遍。';$('qopts').innerHTML='';$('qb').style.width='100%';cq=null;return}
+  cq=qdeck[qi];
+  let mode=$('qm').value;
+  $('qmeta').textContent=`${mode==='en2de'?'看英文选德文':'看德文选英文'} · ${qi+1}/${qdeck.length} · P.${cq[4]}`;
+  $('qp').textContent= mode==='en2de' ? cq[2] : cq[0];
+  $('qsub').textContent= mode==='en2de' ? ('中文：'+cq[1]) : ('中文：'+cq[1]+' ｜ English 选项下面也有中文小字');
+  $('qb').style.width=(qi/qdeck.length*100)+'%';
+  renderQuizOptions(uniqChoiceDeck(cq), mode);
+}
+function answerQuiz(chosenIdx){
+  if(!cq || qAnswered) return;
+  qAnswered=true;
+  let correctIdx=V.indexOf(cq), chosen=V[chosenIdx];
+  let good = chosenIdx===correctIdx;
+  if(good){
+    $('qfeed').className='feedback ok';
+    $('qfeed').innerHTML=`✅ 正确！<b>${esc(cq[0])}</b> = ${esc(cq[1])} ｜ ${esc(cq[2])}`;
+    if(!S.know.includes(correctIdx)) S.know.push(correctIdx);
+    if((S.wrong[correctIdx]||0)>0){S.wrong[correctIdx]--; if(S.wrong[correctIdx]<=0) delete S.wrong[correctIdx];}
+  }else{
+    $('qfeed').className='feedback no';
+    $('qfeed').innerHTML=`❌ 选错了。正确答案：<b>${esc(cq[0])}</b> = ${esc(cq[1])} ｜ ${esc(cq[2])}`;
+    S.wrong[correctIdx]=(S.wrong[correctIdx]||0)+1;
+    S.know=S.know.filter(x=>x!==correctIdx);
+  }
+  save();
+  markQuizOptions(correctIdx, chosenIdx);
+  $('qnext').disabled=false;
+}
+function showQuizAns(){
+  if(!cq || qAnswered) return;
+  qAnswered=true;
+  let correctIdx=V.indexOf(cq);
+  S.wrong[correctIdx]=(S.wrong[correctIdx]||0)+1;
+  S.know=S.know.filter(x=>x!==correctIdx);
+  save();
+  $('qfeed').className='feedback no';
+  $('qfeed').innerHTML=`答案：<b>${esc(cq[0])}</b><br>${esc(cq[1])} ｜ ${esc(cq[2])}`;
+  markQuizOptions(correctIdx, null);
+  $('qnext').disabled=false;
+}
+function nextQuizManual(){
+  if(!cq) return;
+  qi++;
+  nextQuiz();
+}
+
+function startCopy(){
+  cdeck=mix(pool($('cs').value));
+  ci=0;
+  nextCopy();
+}
+function nextCopy(){
+  if(!cdeck.length){
+    $('cw').textContent='这个范围暂时没有词';
+    $('cmean').textContent='';
+    cc=null;
+    return;
+  }
+  if(ci>=cdeck.length){
+    $('cw').textContent='🎉 这一轮全部打完了！';
+    $('cm').textContent='建议现在去“默写”测试一次';
+    $('cmean').textContent='';
+    $('ci').value='';
+    $('cb').style.width='100%';
+    cc=null;
+    return;
+  }
+
+  cc=cdeck[ci];
+  $('cw').textContent=cc[0];
+  $('cm').textContent=`P.${cc[4]} · ${cc[3]} · ${ci+1}/${cdeck.length}`;
+  $('cmean').textContent=cc[1]+' ｜ English: '+cc[2];
+  $('ci').value='';
+  $('cfeed').className='feedback';
+  $('cfeed').textContent='';
+  $('cb').style.width=(ci/cdeck.length*100)+'%';
+  $('ci').focus();
+}
+function checkCopy(){
+  if(!cc)return;
+
+  let a=$('ci').value;
+  let exact=n(a)===n(cc[0]);
+  let near=loose(a)===loose(cc[0]);
+  let idx=V.indexOf(cc);
+  let f=$('cfeed');
+
+  if(exact){
+    f.className='feedback ok';
+    f.innerHTML=`✅ 打对了：<b>${esc(cc[0])}</b>`;
+    if(!S.know.includes(idx))S.know.push(idx);
+
+    if((S.wrong[idx]||0)>0){
+      S.wrong[idx]--;
+      if(S.wrong[idx]<=0)delete S.wrong[idx];
+    }
+    save();
+
+    setTimeout(()=>{
+      ci++;
+      nextCopy();
+    },700);
+  }else{
+    f.className='feedback no';
+    f.innerHTML=`❌ 再打一遍。<br>正确：<b>${esc(cc[0])}</b><br>${near?'你已经很接近了，重点检查 ä / ö / ü / ß、冠词和大小写。':'请一个字母一个字母对照上面的德语重新输入。'}`;
+
+    S.wrong[idx]=(S.wrong[idx]||0)+1;
+    S.know=S.know.filter(x=>x!==idx);
+    save();
+
+    // 同一个错词放到队尾，确保本轮再次出现
+    cdeck.push(cc);
+    $('ci').select();
+  }
+}
+function copyAgainLater(){
+  if(!cc)return;
+  let idx=V.indexOf(cc);
+  S.wrong[idx]=(S.wrong[idx]||0)+1;
+  S.know=S.know.filter(x=>x!==idx);
+  save();
+
+  cdeck.push(cc);
+  ci++;
+  nextCopy();
+}
+
+function renderWrong(){let ids=Object.keys(S.wrong).map(Number).sort((a,b)=>S.wrong[b]-S.wrong[a]);$('wl').innerHTML=ids.length?ids.map(i=>`<div class="wrong"><div><b>${esc(V[i][0])}</b><div>${esc(V[i][1])} <span class="small">· ${esc(V[i][2])} · P.${V[i][4]} · 错 ${S.wrong[i]} 次</span></div></div><button class="spk" onclick="speak(V[${i}][0])">🔊</button></div>`).join(''):'<div class="empty">🎉 目前没有错题。</div>'}
+function clearWrong(){if(confirm('确定清空错题集吗？')){S.wrong={};save()}}
+function goWrong(){document.querySelector('[data-id="dict"]').click();$('ds').value='wrong';startDict()}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));b.classList.add('on');$(b.dataset.id).classList.add('on');if(b.dataset.id==='flash'&&!cf)startFlash();if(b.dataset.id==='mcq'&&!cq)startQuiz();if(b.dataset.id==='copy'&&!cc)startCopy();if(b.dataset.id==='wrong')renderWrong()});
+$('pf').onchange=render;$('q').oninput=render;$('di').onkeydown=e=>{if(e.key==='Enter')check()};$('ci').onkeydown=e=>{if(e.key==='Enter')checkCopy()};$('dm').onchange=()=>{if(cd)nextDict()};$('qm').onchange=()=>{if(cq)nextQuiz()};$('qs').onchange=()=>{};
+stats();render();renderWrong();
+</script></body></html>
